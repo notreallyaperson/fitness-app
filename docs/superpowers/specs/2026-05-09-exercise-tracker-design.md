@@ -29,7 +29,7 @@ A web-based personal exercise tracker, built as a Progressive Web App (PWA), use
 
 | Phase | Scope |
 |---|---|
-| **1 (MVP)** | Auth + profiles; exercise library + search; muscle tags on exercises (data only); workout templates; live sessions (start from template / repeat-last / fresh); set logging with weight/reps/time/distance/RPE; warmup marker; rest timer; per-exercise last-3 history; reorder exercises; edit session date; per-set / per-exercise / per-session notes; units toggle (kg/lbs, km/mi). |
+| **1 (MVP)** | Auth + profiles; exercise library + search; muscle tags on exercises (data only); equipment tags on exercises with filterable search and per-workout equipment summary; workout templates; live sessions (start from template / repeat-last / fresh); set logging with weight/reps/time/distance/RPE; warmup marker; rest timer; per-exercise last-3 history; reorder exercises; edit session date; per-set / per-exercise / per-session notes; units toggle (kg/lbs, km/mi). |
 | **2** | Body measurements (weight, height, body-fat %) tracked over time, with charts. |
 | **3** | Weekly / monthly summaries; total effort (volume) computed via per-exercise formulas; period filters. |
 | **4** | Claude-powered workout recommendations using the user's BYO Anthropic API key. |
@@ -87,6 +87,7 @@ Extends `auth.users` 1:1.
 | `units_weight` | enum `'kg' \| 'lbs'` | default `'kg'` |
 | `units_distance` | enum `'km' \| 'mi'` | default `'km'` |
 | `default_bodyweight` | numeric | most-recent bodyweight cache |
+| `available_equipment` | enum `equipment_type`[] | "what I have" preset for the search filter; nullable |
 
 ### `exercises` — library
 | Column | Type | Notes |
@@ -99,6 +100,7 @@ Extends `auth.users` 1:1.
 | `default_rest_seconds` | int | default rest between sets |
 | `primary_muscle` | enum `muscle_group` | (Phase 1 data; UI in Phase 2) |
 | `secondary_muscles` | enum `muscle_group`[] | array |
+| `equipment` | enum `equipment_type`[] | required equipment; empty = none / bodyweight only. Indexed with GIN for filter queries. |
 | `is_archived` | bool | default false |
 
 ### `workout_templates`
@@ -185,6 +187,7 @@ Extends `auth.users` 1:1.
 ### Enums
 - `muscle_group`: `chest, back, lats, traps, lower_back, shoulders, biceps, triceps, forearms, quads, hamstrings, glutes, calves, abs, obliques, neck, full_body, cardio`.
 - `metric_kind`: `weight_reps, bodyweight_reps, weighted_bodyweight_reps, time_only, time_weight, distance_only, distance_time, none`.
+- `equipment_type`: `bodyweight, barbell, dumbbell, kettlebell, ez_bar, trap_bar, plates, bench, incline_bench, decline_bench, squat_rack, power_rack, smith_machine, cable_machine, pulldown_machine, leg_press, leg_extension, leg_curl, hack_squat, pull_up_bar, dip_bar, parallel_bars, rings, suspension_trainer, resistance_band, medicine_ball, ab_wheel, foam_roller, box, bosu_ball, jump_rope, sled, treadmill, stationary_bike, rowing_machine, elliptical, stair_climber, swimming_pool`. Extensible via migration.
 
 ### RLS policies (Phase 1)
 - `profiles, workout_templates, workout_template_exercises (via template), sessions, session_exercises (via session), sets (via session_exercise), user_secrets, body_measurements`: `USING (user_id = auth.uid())`.
@@ -210,6 +213,10 @@ Each exercise has a `metric_kind` that determines (a) which fields appear when l
 - Unit normalisation: a weight stored as `lbs` is converted to `kg` before summing in the canonical view; the UI converts back to user's preferred unit at render time.
 
 ## 7. Key user flows
+
+### Equipment search filter & workout equipment summary
+- **Exercise search:** filter UI offers multi-select `equipment_type` chips (bodyweight, barbell, dumbbell, ...). Query: `WHERE equipment && ARRAY[selected_equipment]::equipment_type[]` (GIN-indexed array overlap). Includes a "What I have" preset stored on `profiles.available_equipment` so search defaults to filtering to the user's gym setup; toggleable per search.
+- **Workout equipment summary:** on each `workout_template` and `session`, render a deduped chip list of all equipment needed (union of equipment arrays across the workout's exercises). Shown at the top of the live session screen and on the template detail screen, so the user knows what to grab before starting.
 
 ### A. Live session screen
 Mobile-first. Exercises listed in `position` order; the "active" one (next un-logged set) is auto-expanded. Set logging accepts whichever fields the exercise's `metric_kind` requires. Logging a set starts a rest timer using `template_exercise.rest_seconds → exercise.default_rest_seconds`. The timer vibrates and plays a sound at zero (PWA Vibration API + audio).
@@ -282,5 +289,5 @@ Listed for clarity, not implementation:
 ## 10. Open questions
 
 - **Email/auth provider list:** start with email magic link only? Add Google OAuth from day 1? (Defer to plan.)
-- **System exercise seed list:** which exercises ship as built-in `owner_user_id IS NULL` rows? (Defer to plan — likely a curated list of ~80 common exercises with `metric_kind` and `primary_muscle` populated.)
+- **System exercise seed list:** which exercises ship as built-in `owner_user_id IS NULL` rows? (Defer to plan — likely a curated list of ~80 common exercises with `metric_kind`, `primary_muscle`, and `equipment` populated.)
 - **Encryption key rotation:** how is `SECRETS_KEY` rotated if needed? (Re-encrypt all `user_secrets` rows; defer to Phase 4 plan.)
