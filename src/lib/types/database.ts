@@ -31,137 +31,140 @@ type EquipmentType =
 type WeightUnitT = "kg" | "lbs";
 type DistanceUnitT = "m" | "km" | "mi";
 
+type ProfileRow = {
+  id: string;
+  display_name: string | null;
+  units_weight: WeightUnitT;
+  units_distance: DistanceUnitT;
+  default_bodyweight: number | null;
+  available_equipment: EquipmentType[];
+  created_at: string;
+  updated_at: string;
+}
+
+type ExerciseRow = {
+  id: string;
+  owner_user_id: string | null;
+  name: string;
+  description: string | null;
+  metric_kind: MetricKind;
+  default_rest_seconds: number;
+  primary_muscle: MuscleGroup | null;
+  secondary_muscles: MuscleGroup[];
+  equipment: EquipmentType[];
+  is_archived: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+type WorkoutTemplateRow = {
+  id: string;
+  user_id: string;
+  name: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+type WorkoutTemplateExerciseRow = {
+  id: string;
+  template_id: string;
+  exercise_id: string;
+  position: number;
+  target_sets: number | null;
+  target_reps: number | null;
+  target_weight: number | null;
+  target_time_seconds: number | null;
+  target_distance: number | null;
+  target_distance_unit: DistanceUnitT | null;
+  rest_seconds: number | null;
+  notes: string | null;
+}
+
+type SessionRow = {
+  id: string;
+  user_id: string;
+  template_id: string | null;
+  name: string;
+  performed_on: string;
+  started_at: string;
+  ended_at: string | null;
+  bodyweight: number | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+type SessionExerciseRow = {
+  id: string;
+  session_id: string;
+  exercise_id: string;
+  position: number;
+  notes: string | null;
+}
+
+type SetRow = {
+  id: string;
+  session_exercise_id: string;
+  position: number;
+  is_warmup: boolean;
+  reps: number | null;
+  weight: number | null;
+  weight_unit: WeightUnitT | null;
+  time_seconds: number | null;
+  distance: number | null;
+  distance_unit: DistanceUnitT | null;
+  rpe: number | null;
+  notes: string | null;
+  completed_at: string;
+}
+
+type SetVolumeRow = {
+  set_id: string;
+  session_exercise_id: string;
+  session_id: string;
+  exercise_id: string;
+  is_warmup: boolean;
+  volume_kg: number;
+}
+
 export interface Database {
   public: {
     Tables: {
-      profiles: {
-        Row: {
-          id: string;
-          display_name: string | null;
-          units_weight: WeightUnitT;
-          units_distance: DistanceUnitT;
-          default_bodyweight: number | null;
-          available_equipment: EquipmentType[];
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Partial<Database["public"]["Tables"]["profiles"]["Row"]> & { id: string };
-        Update: Partial<Database["public"]["Tables"]["profiles"]["Row"]>;
-      };
-      exercises: {
-        Row: {
-          id: string;
-          owner_user_id: string | null;
-          name: string;
-          description: string | null;
-          metric_kind: MetricKind;
-          default_rest_seconds: number;
-          primary_muscle: MuscleGroup | null;
-          secondary_muscles: MuscleGroup[];
-          equipment: EquipmentType[];
-          is_archived: boolean;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Omit<Database["public"]["Tables"]["exercises"]["Row"], "id" | "created_at" | "updated_at"> & { id?: string };
-        Update: Partial<Database["public"]["Tables"]["exercises"]["Row"]>;
-      };
-      workout_templates: {
-        Row: {
-          id: string;
-          user_id: string;
-          name: string;
-          notes: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Omit<Database["public"]["Tables"]["workout_templates"]["Row"], "id" | "created_at" | "updated_at"> & { id?: string };
-        Update: Partial<Database["public"]["Tables"]["workout_templates"]["Row"]>;
-      };
+      profiles: { Row: ProfileRow; Insert: Partial<ProfileRow> & { id: string }; Update: Partial<ProfileRow>; Relationships: [] };
+      exercises: { Row: ExerciseRow; Insert: Omit<ExerciseRow, "id" | "created_at" | "updated_at"> & { id?: string }; Update: Partial<ExerciseRow>; Relationships: [] };
+      workout_templates: { Row: WorkoutTemplateRow; Insert: Omit<WorkoutTemplateRow, "id" | "created_at" | "updated_at"> & { id?: string }; Update: Partial<WorkoutTemplateRow>; Relationships: [] };
       workout_template_exercises: {
-        Row: {
-          id: string;
-          template_id: string;
-          exercise_id: string;
-          position: number;
-          target_sets: number | null;
-          target_reps: number | null;
-          target_weight: number | null;
-          target_time_seconds: number | null;
-          target_distance: number | null;
-          target_distance_unit: DistanceUnitT | null;
-          rest_seconds: number | null;
-          notes: string | null;
-        };
-        Insert: Omit<Database["public"]["Tables"]["workout_template_exercises"]["Row"], "id"> & { id?: string };
-        Update: Partial<Database["public"]["Tables"]["workout_template_exercises"]["Row"]>;
+        Row: WorkoutTemplateExerciseRow;
+        Insert: Omit<WorkoutTemplateExerciseRow, "id"> & { id?: string };
+        Update: Partial<WorkoutTemplateExerciseRow>;
+        Relationships: [];
       };
       sessions: {
-        Row: {
-          id: string;
-          user_id: string;
-          template_id: string | null;
-          name: string;
-          performed_on: string;
-          started_at: string;
-          ended_at: string | null;
-          bodyweight: number | null;
-          notes: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Omit<Database["public"]["Tables"]["sessions"]["Row"], "id" | "created_at" | "updated_at" | "started_at" | "performed_on"> & {
+        Row: SessionRow;
+        Insert: Omit<SessionRow, "id" | "created_at" | "updated_at" | "started_at" | "performed_on"> & {
           id?: string;
           started_at?: string;
           performed_on?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["sessions"]["Row"]>;
+        Update: Partial<SessionRow>;
+        Relationships: [];
       };
       session_exercises: {
-        Row: {
-          id: string;
-          session_id: string;
-          exercise_id: string;
-          position: number;
-          notes: string | null;
-        };
-        Insert: Omit<Database["public"]["Tables"]["session_exercises"]["Row"], "id"> & { id?: string };
-        Update: Partial<Database["public"]["Tables"]["session_exercises"]["Row"]>;
+        Row: SessionExerciseRow;
+        Insert: Omit<SessionExerciseRow, "id"> & { id?: string };
+        Update: Partial<SessionExerciseRow>;
+        Relationships: [];
       };
       sets: {
-        Row: {
-          id: string;
-          session_exercise_id: string;
-          position: number;
-          is_warmup: boolean;
-          reps: number | null;
-          weight: number | null;
-          weight_unit: WeightUnitT | null;
-          time_seconds: number | null;
-          distance: number | null;
-          distance_unit: DistanceUnitT | null;
-          rpe: number | null;
-          notes: string | null;
-          completed_at: string;
-        };
-        Insert: Omit<Database["public"]["Tables"]["sets"]["Row"], "id" | "completed_at"> & {
-          id?: string;
-          completed_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["sets"]["Row"]>;
+        Row: SetRow;
+        Insert: Omit<SetRow, "id" | "completed_at"> & { id?: string; completed_at?: string };
+        Update: Partial<SetRow>;
+        Relationships: [];
       };
     };
     Views: {
-      set_volumes: {
-        Row: {
-          set_id: string;
-          session_exercise_id: string;
-          session_id: string;
-          exercise_id: string;
-          is_warmup: boolean;
-          volume_kg: number;
-        };
-      };
+      set_volumes: { Row: SetVolumeRow; Relationships: [] };
     };
     Functions: Record<string, never>;
     Enums: {
