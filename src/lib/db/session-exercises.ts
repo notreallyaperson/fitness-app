@@ -51,12 +51,17 @@ export async function replaceSessionExercise(
 ): Promise<void> {
   const supabase = await assertOwnsSession(sessionId);
   // The caller is expected to confirm with the user before discarding sets.
-  const { error } = await supabase
+  // Delete sets FIRST so a partial failure leaves the old (consistent) state,
+  // not sets pointing at an exercise of the wrong metric_kind.
+  const { error: e1 } = await supabase
+    .from("sets")
+    .delete()
+    .eq("session_exercise_id", rowId);
+  if (e1) throw e1;
+  const { error: e2 } = await supabase
     .from("session_exercises")
     .update({ exercise_id: newExerciseId })
     .eq("id", rowId);
-  if (error) throw error;
-  const { error: e2 } = await supabase.from("sets").delete().eq("session_exercise_id", rowId);
   if (e2) throw e2;
 }
 

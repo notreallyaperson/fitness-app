@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -45,6 +46,7 @@ export function SetLogForm({
   const [time, setTime] = useState("");
   const [distance, setDistance] = useState("");
   const [rpe, setRpe] = useState("");
+  const [notes, setNotes] = useState("");
   const [warmup, setWarmup] = useState(false);
   const [, startTransition] = useTransition();
 
@@ -58,16 +60,22 @@ export function SetLogForm({
       distance_unit: f.distance ? defaultDistanceUnit : null,
       rpe: rpe ? Number(rpe) : null,
       is_warmup: warmup,
+      notes: notes.trim() || null,
     };
     startTransition(async () => {
-      await appendSetAction(sessionId, sessionExerciseId, payload);
-      setReps("");
-      setWeight("");
-      setTime("");
-      setDistance("");
-      setRpe("");
-      setWarmup(false);
-      onLogged?.();
+      try {
+        await appendSetAction(sessionId, sessionExerciseId, payload);
+        setReps("");
+        setWeight("");
+        setTime("");
+        setDistance("");
+        setRpe("");
+        setNotes("");
+        setWarmup(false);
+        onLogged?.();
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Couldn't log set");
+      }
     });
   };
 
@@ -98,6 +106,13 @@ export function SetLogForm({
           <Label htmlFor="warmup">Warmup</Label>
         </label>
       </div>
+      <Input
+        type="text"
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        placeholder="Note (optional)"
+        className="text-xs"
+      />
       <Button onClick={submit} className="w-full">
         Log set
       </Button>

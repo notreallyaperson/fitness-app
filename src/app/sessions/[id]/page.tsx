@@ -45,6 +45,7 @@ export default async function LiveSessionPage({
         bodyweight={session.bodyweight ? Number(session.bodyweight) : null}
         weightUnit={profile.units_weight}
         equipment={equipment}
+        notes={session.notes}
       />
 
       {rows.length === 0 ? (

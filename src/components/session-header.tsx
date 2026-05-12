@@ -18,6 +18,7 @@ interface Props {
   bodyweight: number | null;
   weightUnit: "kg" | "lbs";
   equipment: string[];
+  notes: string | null;
 }
 
 export function SessionHeader({
@@ -29,6 +30,7 @@ export function SessionHeader({
   bodyweight,
   weightUnit,
   equipment,
+  notes,
 }: Props) {
   const [, startTransition] = useTransition();
   const [now, setNow] = useState(() => Date.now());
@@ -112,6 +114,14 @@ export function SessionHeader({
           ))}
         </div>
       )}
+      <Input
+        defaultValue={notes ?? ""}
+        placeholder="Session notes (optional)"
+        onBlur={(e) =>
+          save({ notes: e.currentTarget.value.trim() === "" ? null : e.currentTarget.value })
+        }
+        className="h-8 text-xs"
+      />
     </header>
   );
 }

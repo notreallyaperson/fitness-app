@@ -31,6 +31,24 @@ export function RestTimer({ startedAt, defaultSeconds, onAdjust, onCancel }: Pro
       } catch {
         /* noop */
       }
+      try {
+        // Short synthesized beep; iOS Safari blocks navigator.vibrate but
+        // allows Web Audio after a user gesture (logging the set counts).
+        const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+        if (!AC) return;
+        const ctx = new AC();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = 880;
+        gain.gain.value = 0.15;
+        osc.connect(gain).connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+        setTimeout(() => ctx.close().catch(() => {}), 200);
+      } catch {
+        /* noop */
+      }
     }
   }, [now, startedAt, duration]);
 

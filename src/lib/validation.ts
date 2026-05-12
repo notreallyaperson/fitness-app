@@ -29,3 +29,20 @@ export const SessionUpdateSchema = z.object({
   ended_at: z.string().datetime().nullable().optional(),
 });
 export type SessionUpdate = z.infer<typeof SessionUpdateSchema>;
+
+/**
+ * Whitelisted fields the user can edit on a workout_template_exercises row.
+ * Excludes structural fields (template_id, exercise_id, position, id) so a
+ * malicious client can't repoint rows or collide on the unique position.
+ */
+export const TemplateExercisePatchSchema = z.object({
+  target_sets: z.number().int().nonnegative().nullable().optional(),
+  target_reps: z.number().int().nonnegative().nullable().optional(),
+  target_weight: z.number().nonnegative().nullable().optional(),
+  target_time_seconds: z.number().int().nonnegative().nullable().optional(),
+  target_distance: z.number().nonnegative().nullable().optional(),
+  target_distance_unit: z.enum(["m", "km", "mi"]).nullable().optional(),
+  rest_seconds: z.number().int().nonnegative().nullable().optional(),
+  notes: z.string().max(500).nullable().optional(),
+});
+export type TemplateExercisePatch = z.infer<typeof TemplateExercisePatchSchema>;
