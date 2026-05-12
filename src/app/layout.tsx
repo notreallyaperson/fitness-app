@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Header } from "@/components/header";
 import { Toaster } from "@/components/ui/sonner";
+import { RegisterSW } from "@/components/register-sw";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default function RootLayout({
         className={`${inter.className} min-h-dvh bg-background text-foreground`}
       >
         <Header />
+        <RegisterSW />
         <main className="mx-auto max-w-2xl p-4 pb-24">{children}</main>
         <Toaster />
       </body>
