@@ -1,6 +1,7 @@
 // Hand-written stub matching the migrations exactly. Will be replaced
 // by `pnpm db:types` (supabase gen types typescript --linked) once the
-// remote DB is linked. The shapes here match what supabase generates.
+// remote DB is linked. Insert types mark nullable columns + DB-default
+// columns as optional, matching what supabase generates.
 
 export type Json =
   | string
@@ -40,7 +41,17 @@ type ProfileRow = {
   available_equipment: EquipmentType[];
   created_at: string;
   updated_at: string;
-}
+};
+type ProfileInsert = {
+  id: string;
+  display_name?: string | null;
+  units_weight?: WeightUnitT;
+  units_distance?: DistanceUnitT;
+  default_bodyweight?: number | null;
+  available_equipment?: EquipmentType[];
+  created_at?: string;
+  updated_at?: string;
+};
 
 type ExerciseRow = {
   id: string;
@@ -55,7 +66,21 @@ type ExerciseRow = {
   is_archived: boolean;
   created_at: string;
   updated_at: string;
-}
+};
+type ExerciseInsert = {
+  id?: string;
+  owner_user_id?: string | null;
+  name: string;
+  description?: string | null;
+  metric_kind: MetricKind;
+  default_rest_seconds?: number;
+  primary_muscle?: MuscleGroup | null;
+  secondary_muscles?: MuscleGroup[];
+  equipment?: EquipmentType[];
+  is_archived?: boolean;
+  created_at?: string;
+  updated_at?: string;
+};
 
 type WorkoutTemplateRow = {
   id: string;
@@ -64,7 +89,15 @@ type WorkoutTemplateRow = {
   notes: string | null;
   created_at: string;
   updated_at: string;
-}
+};
+type WorkoutTemplateInsert = {
+  id?: string;
+  user_id: string;
+  name: string;
+  notes?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
 
 type WorkoutTemplateExerciseRow = {
   id: string;
@@ -79,7 +112,21 @@ type WorkoutTemplateExerciseRow = {
   target_distance_unit: DistanceUnitT | null;
   rest_seconds: number | null;
   notes: string | null;
-}
+};
+type WorkoutTemplateExerciseInsert = {
+  id?: string;
+  template_id: string;
+  exercise_id: string;
+  position: number;
+  target_sets?: number | null;
+  target_reps?: number | null;
+  target_weight?: number | null;
+  target_time_seconds?: number | null;
+  target_distance?: number | null;
+  target_distance_unit?: DistanceUnitT | null;
+  rest_seconds?: number | null;
+  notes?: string | null;
+};
 
 type SessionRow = {
   id: string;
@@ -93,7 +140,20 @@ type SessionRow = {
   notes: string | null;
   created_at: string;
   updated_at: string;
-}
+};
+type SessionInsert = {
+  id?: string;
+  user_id: string;
+  template_id?: string | null;
+  name: string;
+  performed_on?: string;
+  started_at?: string;
+  ended_at?: string | null;
+  bodyweight?: number | null;
+  notes?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
 
 type SessionExerciseRow = {
   id: string;
@@ -101,7 +161,14 @@ type SessionExerciseRow = {
   exercise_id: string;
   position: number;
   notes: string | null;
-}
+};
+type SessionExerciseInsert = {
+  id?: string;
+  session_id: string;
+  exercise_id: string;
+  position: number;
+  notes?: string | null;
+};
 
 type SetRow = {
   id: string;
@@ -117,7 +184,22 @@ type SetRow = {
   rpe: number | null;
   notes: string | null;
   completed_at: string;
-}
+};
+type SetInsert = {
+  id?: string;
+  session_exercise_id: string;
+  position: number;
+  is_warmup?: boolean;
+  reps?: number | null;
+  weight?: number | null;
+  weight_unit?: WeightUnitT | null;
+  time_seconds?: number | null;
+  distance?: number | null;
+  distance_unit?: DistanceUnitT | null;
+  rpe?: number | null;
+  notes?: string | null;
+  completed_at?: string;
+};
 
 type SetVolumeRow = {
   set_id: string;
@@ -126,39 +208,35 @@ type SetVolumeRow = {
   exercise_id: string;
   is_warmup: boolean;
   volume_kg: number;
-}
+};
 
 export interface Database {
   public: {
     Tables: {
-      profiles: { Row: ProfileRow; Insert: Partial<ProfileRow> & { id: string }; Update: Partial<ProfileRow>; Relationships: [] };
-      exercises: { Row: ExerciseRow; Insert: Omit<ExerciseRow, "id" | "created_at" | "updated_at"> & { id?: string }; Update: Partial<ExerciseRow>; Relationships: [] };
-      workout_templates: { Row: WorkoutTemplateRow; Insert: Omit<WorkoutTemplateRow, "id" | "created_at" | "updated_at"> & { id?: string }; Update: Partial<WorkoutTemplateRow>; Relationships: [] };
+      profiles: { Row: ProfileRow; Insert: ProfileInsert; Update: Partial<ProfileRow>; Relationships: [] };
+      exercises: { Row: ExerciseRow; Insert: ExerciseInsert; Update: Partial<ExerciseRow>; Relationships: [] };
+      workout_templates: { Row: WorkoutTemplateRow; Insert: WorkoutTemplateInsert; Update: Partial<WorkoutTemplateRow>; Relationships: [] };
       workout_template_exercises: {
         Row: WorkoutTemplateExerciseRow;
-        Insert: Omit<WorkoutTemplateExerciseRow, "id"> & { id?: string };
+        Insert: WorkoutTemplateExerciseInsert;
         Update: Partial<WorkoutTemplateExerciseRow>;
         Relationships: [];
       };
       sessions: {
         Row: SessionRow;
-        Insert: Omit<SessionRow, "id" | "created_at" | "updated_at" | "started_at" | "performed_on"> & {
-          id?: string;
-          started_at?: string;
-          performed_on?: string;
-        };
+        Insert: SessionInsert;
         Update: Partial<SessionRow>;
         Relationships: [];
       };
       session_exercises: {
         Row: SessionExerciseRow;
-        Insert: Omit<SessionExerciseRow, "id"> & { id?: string };
+        Insert: SessionExerciseInsert;
         Update: Partial<SessionExerciseRow>;
         Relationships: [];
       };
       sets: {
         Row: SetRow;
-        Insert: Omit<SetRow, "id" | "completed_at"> & { id?: string; completed_at?: string };
+        Insert: SetInsert;
         Update: Partial<SetRow>;
         Relationships: [];
       };
