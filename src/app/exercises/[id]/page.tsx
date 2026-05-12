@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { getExercise } from "@/lib/db/exercises";
 import { humaniseEnum } from "@/lib/enums";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ExerciseHistorySheet } from "@/components/exercise-history-sheet";
 
 export default async function ExerciseDetailPage({
   params,
@@ -36,10 +38,17 @@ export default async function ExerciseDetailPage({
       )}
 
       <section className="rounded-lg border p-4">
-        <h2 className="text-sm font-semibold">Last 3 sessions</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          History will appear here once logged.
-        </p>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold">Last 3 sessions</h2>
+          <ExerciseHistorySheet
+            exerciseId={ex.id}
+            trigger={
+              <Button size="sm" variant="outline">
+                View
+              </Button>
+            }
+          />
+        </div>
       </section>
 
       <section className="text-xs text-muted-foreground">
