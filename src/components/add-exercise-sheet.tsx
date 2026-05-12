@@ -12,11 +12,13 @@ import { searchExercisesForPicker } from "@/server/actions/exercises";
 export function AddExerciseSheet({
   triggerLabel,
   triggerVariant = "outline",
+  triggerNode,
   onPick,
   defaultEquipment = [],
 }: {
-  triggerLabel: string;
+  triggerLabel?: string;
   triggerVariant?: "default" | "outline" | "secondary" | "ghost" | "destructive" | "link";
+  triggerNode?: React.ReactElement;
   onPick: (exerciseId: string) => Promise<void> | void;
   defaultEquipment?: EquipmentType[];
 }) {
@@ -38,9 +40,13 @@ export function AddExerciseSheet({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger render={<Button variant={triggerVariant} className="w-full" />}>
-        {triggerLabel}
-      </SheetTrigger>
+      {triggerNode ? (
+        <SheetTrigger render={triggerNode} />
+      ) : (
+        <SheetTrigger render={<Button variant={triggerVariant} className="w-full" />}>
+          {triggerLabel}
+        </SheetTrigger>
+      )}
       <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto">
         <SheetTitle>Add exercise</SheetTitle>
         <div className="space-y-3 pt-3">
