@@ -42,3 +42,13 @@ next-env.d.ts
 
 # claude code local settings
 .claude/settings.local.json
+
+# Supabase
+supabase/.branches
+supabase/.temp
+.env*.local
+
+# Test artifacts
+playwright-report
+test-results
+coverage

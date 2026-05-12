@@ -1,0 +1,5 @@
+.next
+node_modules
+public
+supabase/.branches
+src/lib/types/database.ts
