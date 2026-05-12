@@ -91,7 +91,7 @@ export function SessionExerciseCard({
         <div className="text-[11px] text-muted-foreground">{humaniseEnum(metricKind)}</div>
         <div className="space-y-1">
           {sets.map((s) => (
-            <SetRow key={s.id} sessionId={sessionId} set={s} metricKind={metricKind} />
+            <SetRow key={s.id} sessionId={sessionId} set={s} />
           ))}
         </div>
         <SetLogForm

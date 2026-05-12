@@ -2,18 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { deleteSetAction } from "@/server/actions/sessions";
-import type { MetricKind, WorkoutSet } from "@/lib/types/domain";
+import type { WorkoutSet } from "@/lib/types/domain";
 
 export function SetRow({
   sessionId,
   set,
-  // metricKind is kept on the API for future per-kind formatting tweaks;
-  // current display already adapts to whichever fields are non-null.
-  metricKind: _metricKind,
 }: {
   sessionId: string;
   set: WorkoutSet;
-  metricKind: MetricKind;
 }) {
   const parts: string[] = [];
   if (set.weight != null) parts.push(`${set.weight}${set.weight_unit ?? ""}`);
