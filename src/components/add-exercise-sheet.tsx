@@ -41,7 +41,9 @@ export function AddExerciseSheet({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       {triggerNode ? (
-        <SheetTrigger render={triggerNode} />
+        // triggerNode can be a non-button element (e.g. a menuitem), so tell
+        // Base UI not to expect native <button> semantics.
+        <SheetTrigger render={triggerNode} nativeButton={false} />
       ) : (
         <SheetTrigger render={<Button variant={triggerVariant} className="w-full" />}>
           {triggerLabel}
