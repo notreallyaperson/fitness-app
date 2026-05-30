@@ -6,8 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import type { MetricKind } from "@/lib/types/domain";
 import { appendSetAction } from "@/server/actions/sessions";
+
+const RPE_OPTIONS = [
+  { label: "Easy", value: 6 },
+  { label: "Moderate", value: 8 },
+  { label: "Hard", value: 9 },
+  { label: "Max", value: 10 },
+] as const;
 
 interface Props {
   sessionId: string;
@@ -45,7 +53,7 @@ export function SetLogForm({
   const [weight, setWeight] = useState("");
   const [time, setTime] = useState("");
   const [distance, setDistance] = useState("");
-  const [rpe, setRpe] = useState("");
+  const [rpe, setRpe] = useState<number | null>(null);
   const [notes, setNotes] = useState("");
   const [warmup, setWarmup] = useState(false);
   const [, startTransition] = useTransition();
@@ -58,7 +66,7 @@ export function SetLogForm({
       time_seconds: time ? Number(time) : null,
       distance: distance ? Number(distance) : null,
       distance_unit: f.distance ? defaultDistanceUnit : null,
-      rpe: rpe ? Number(rpe) : null,
+      rpe,
       is_warmup: warmup,
       notes: notes.trim() || null,
     };
@@ -69,7 +77,7 @@ export function SetLogForm({
         setWeight("");
         setTime("");
         setDistance("");
-        setRpe("");
+        setRpe(null);
         setNotes("");
         setWarmup(false);
         onLogged?.();
@@ -100,12 +108,12 @@ export function SetLogForm({
             step="0.01"
           />
         )}
-        <Field label="RPE" value={rpe} onChange={setRpe} step="0.5" />
         <label className="flex items-center gap-2 text-xs">
           <Switch checked={warmup} onCheckedChange={setWarmup} id="warmup" />
           <Label htmlFor="warmup">Warmup</Label>
         </label>
       </div>
+      <RpeSelector value={rpe} onChange={setRpe} />
       <Input
         type="text"
         value={notes}
@@ -116,6 +124,44 @@ export function SetLogForm({
       <Button onClick={submit} className="w-full">
         Log set
       </Button>
+    </div>
+  );
+}
+
+function RpeSelector({
+  value,
+  onChange,
+}: {
+  value: number | null;
+  onChange: (v: number | null) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-[11px] text-muted-foreground">RPE</span>
+      <div className="grid grid-cols-4 gap-1">
+        {RPE_OPTIONS.map((opt) => {
+          const selected = value === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => onChange(selected ? null : opt.value)}
+              className={cn(
+                "rounded-md border py-1.5 text-xs transition-colors",
+                selected
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "bg-background hover:bg-muted",
+              )}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+      <span className="text-[10px] text-muted-foreground">
+        Easy = reps left · Max = failure
+      </span>
     </div>
   );
 }
