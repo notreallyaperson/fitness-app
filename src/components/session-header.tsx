@@ -7,7 +7,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { humaniseEnum } from "@/lib/enums";
 import { formatDuration } from "@/lib/units";
-import { updateSessionAction } from "@/server/actions/sessions";
+import {
+  activeElapsedSeconds,
+  isPaused,
+  type PauseInterval,
+} from "@/lib/session-duration";
+import {
+  updateSessionAction,
+  pauseSessionAction,
+  resumeSessionAction,
+  endSessionAction,
+} from "@/server/actions/sessions";
 
 interface Props {
   sessionId: string;
@@ -15,6 +25,7 @@ interface Props {
   performedOn: string;
   startedAt: string;
   endedAt: string | null;
+  pauseIntervals: PauseInterval[];
   bodyweight: number | null;
   weightUnit: "kg" | "lbs";
   equipment: string[];
@@ -27,6 +38,7 @@ export function SessionHeader({
   performedOn,
   startedAt,
   endedAt,
+  pauseIntervals,
   bodyweight,
   weightUnit,
   equipment,
@@ -35,24 +47,39 @@ export function SessionHeader({
   const [, startTransition] = useTransition();
   const [now, setNow] = useState(() => Date.now());
 
+  const paused = isPaused(pauseIntervals);
+
   useEffect(() => {
-    if (endedAt) return;
+    // Only tick while the clock is actually running. When paused the elapsed
+    // value is frozen by the math, and when ended it never changes.
+    if (endedAt || paused) return;
+    setNow(Date.now());
     const i = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(i);
-  }, [endedAt]);
+  }, [endedAt, paused]);
 
-  const elapsed = Math.max(
-    0,
-    Math.floor(
-      ((endedAt ? new Date(endedAt).getTime() : now) -
-        new Date(startedAt).getTime()) /
-        1000,
-    ),
-  );
+  const elapsed = activeElapsedSeconds({
+    startedAt,
+    endedAt,
+    pauseIntervals,
+    now,
+  });
 
   const save = (patch: Record<string, unknown>) =>
     startTransition(() => {
       void updateSessionAction(sessionId, patch);
+    });
+
+  const togglePause = () =>
+    startTransition(() => {
+      void (paused
+        ? resumeSessionAction(sessionId)
+        : pauseSessionAction(sessionId));
+    });
+
+  const endSession = () =>
+    startTransition(() => {
+      void endSessionAction(sessionId);
     });
 
   return (
@@ -63,7 +90,14 @@ export function SessionHeader({
           onBlur={(e) => save({ name: e.currentTarget.value })}
           className="bg-transparent text-xl font-semibold focus:outline-none"
         />
-        <span className="font-mono text-sm">{formatDuration(elapsed)}</span>
+        <span className="flex items-center gap-2 font-mono text-sm">
+          {paused && !endedAt && (
+            <span className="font-sans text-xs font-medium text-amber-600">
+              Paused
+            </span>
+          )}
+          {formatDuration(elapsed)}
+        </span>
       </div>
       <div className="flex flex-wrap items-center gap-3 text-sm">
         <label className="flex items-center gap-2">
@@ -93,13 +127,14 @@ export function SessionHeader({
           />
         </label>
         {!endedAt && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => save({ ended_at: new Date().toISOString() })}
-          >
-            End session
-          </Button>
+          <>
+            <Button size="sm" variant="outline" onClick={togglePause}>
+              {paused ? "Resume" : "Pause"}
+            </Button>
+            <Button size="sm" variant="outline" onClick={endSession}>
+              End session
+            </Button>
+          </>
         )}
         <span className="ml-auto text-xs text-muted-foreground">
           {format(new Date(performedOn), "EEE")}

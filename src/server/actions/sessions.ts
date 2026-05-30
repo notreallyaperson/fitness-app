@@ -8,7 +8,14 @@ import {
   startFromTemplate,
   startRepeatLast,
 } from "@/lib/db/start-session";
-import { updateSession, deleteSession } from "@/lib/db/sessions";
+import {
+  updateSession,
+  deleteSession,
+  getSessionTiming,
+  setPauseIntervals,
+  endSession,
+} from "@/lib/db/sessions";
+import { applyPause, applyResume } from "@/lib/session-duration";
 import {
   appendSessionExercise,
   removeSessionExercise,
@@ -37,6 +44,25 @@ export async function startRepeatLastAction() {
 export async function updateSessionAction(id: string, patchRaw: unknown) {
   const patch = SessionUpdateSchema.parse(patchRaw);
   await updateSession(id, patch);
+  revalidatePath(`/sessions/${id}`);
+}
+
+export async function pauseSessionAction(id: string) {
+  const timing = await getSessionTiming(id);
+  if (!timing || timing.ended_at) return;
+  await setPauseIntervals(id, applyPause(timing.pause_intervals, new Date().toISOString()));
+  revalidatePath(`/sessions/${id}`);
+}
+
+export async function resumeSessionAction(id: string) {
+  const timing = await getSessionTiming(id);
+  if (!timing || timing.ended_at) return;
+  await setPauseIntervals(id, applyResume(timing.pause_intervals, new Date().toISOString()));
+  revalidatePath(`/sessions/${id}`);
+}
+
+export async function endSessionAction(id: string) {
+  await endSession(id, new Date().toISOString());
   revalidatePath(`/sessions/${id}`);
 }
 

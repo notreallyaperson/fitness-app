@@ -1,6 +1,7 @@
 import "server-only";
 import { requireUser } from "@/lib/supabase/server";
 import type { Session, SessionExercise, WorkoutSet } from "@/lib/types/domain";
+import { applyResume, type PauseInterval } from "@/lib/session-duration";
 
 export interface SessionFull extends Session {
   session_exercises: (SessionExercise & {
@@ -84,6 +85,46 @@ export async function updateSession(id: string, patch: Partial<Session>): Promis
     .single();
   if (error) throw error;
   return data;
+}
+
+/** Read just the pause/resume timing for a session (owner-scoped). */
+export async function getSessionTiming(
+  id: string,
+): Promise<{ pause_intervals: PauseInterval[]; ended_at: string | null } | null> {
+  const { supabase, user } = await requireUser();
+  const { data, error } = await supabase
+    .from("sessions")
+    .select("pause_intervals, ended_at")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return {
+    pause_intervals: (data.pause_intervals as PauseInterval[]) ?? [],
+    ended_at: data.ended_at,
+  };
+}
+
+/** Persist the full pause-interval list for a session. */
+export async function setPauseIntervals(
+  id: string,
+  intervals: PauseInterval[],
+): Promise<void> {
+  await updateSession(id, { pause_intervals: intervals });
+}
+
+/**
+ * End a session at `endedAtIso`, closing any open pause interval at the same
+ * instant so the paused tail counts as paused (excluded), not active.
+ */
+export async function endSession(id: string, endedAtIso: string): Promise<void> {
+  const timing = await getSessionTiming(id);
+  if (!timing || timing.ended_at) return;
+  await updateSession(id, {
+    ended_at: endedAtIso,
+    pause_intervals: applyResume(timing.pause_intervals, endedAtIso),
+  });
 }
 
 export async function deleteSession(id: string): Promise<void> {

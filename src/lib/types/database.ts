@@ -164,6 +164,7 @@ export type Database = {
           id: string
           name: string
           notes: string | null
+          pause_intervals: Json
           performed_on: string
           started_at: string
           template_id: string | null
@@ -177,6 +178,7 @@ export type Database = {
           id?: string
           name: string
           notes?: string | null
+          pause_intervals?: Json
           performed_on?: string
           started_at?: string
           template_id?: string | null
@@ -190,6 +192,7 @@ export type Database = {
           id?: string
           name?: string
           notes?: string | null
+          pause_intervals?: Json
           performed_on?: string
           started_at?: string
           template_id?: string | null

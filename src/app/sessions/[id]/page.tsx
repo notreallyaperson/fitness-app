@@ -12,6 +12,7 @@ import {
   deleteSessionAction,
 } from "@/server/actions/sessions";
 import type { MetricKind } from "@/lib/types/domain";
+import type { PauseInterval } from "@/lib/session-duration";
 
 export default async function LiveSessionPage({
   params,
@@ -42,6 +43,7 @@ export default async function LiveSessionPage({
         performedOn={session.performed_on}
         startedAt={session.started_at}
         endedAt={session.ended_at}
+        pauseIntervals={(session.pause_intervals as PauseInterval[]) ?? []}
         bodyweight={session.bodyweight ? Number(session.bodyweight) : null}
         weightUnit={profile.units_weight}
         equipment={equipment}
