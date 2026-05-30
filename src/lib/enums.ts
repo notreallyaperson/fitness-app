@@ -2,8 +2,8 @@ import type { EquipmentType, MetricKind, MuscleGroup } from "@/lib/types/domain"
 
 export const MUSCLE_GROUPS: readonly MuscleGroup[] = [
   "chest","back","lats","traps","lower_back","shoulders","biceps","triceps",
-  "forearms","quads","hamstrings","glutes","calves","abs","obliques","neck",
-  "full_body","cardio",
+  "forearms","quads","hamstrings","glutes","adductors","abductors","groin",
+  "calves","abs","obliques","neck","full_body","cardio",
 ] as const;
 
 export const METRIC_KINDS: readonly MetricKind[] = [
