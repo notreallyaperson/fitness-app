@@ -1,7 +1,11 @@
 # AI-Assisted Exercise Matching on Import
 
 **Date:** 2026-05-30
-**Status:** Approved
+**Status:** OpenAI layer DEFERRED. Shipped instead: suggestion-based matching
+driven by exact name + pg_trgm similarity, with the review screen offering
+"use suggestion / match to an existing exercise / create new". This doc remains
+the design for adding the OpenAI semantic layer later — drop it in behind
+`matchExercises` (exact → OpenAI → trigram fallback) without changing the UI.
 
 ## Goal
 
