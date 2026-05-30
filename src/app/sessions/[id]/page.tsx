@@ -52,23 +52,25 @@ export default async function LiveSessionPage({
         <p className="text-sm text-muted-foreground">Add an exercise below to begin.</p>
       ) : (
         <ReorderableList
-          items={rows.map((row) => ({ id: row.id, row }))}
+          items={rows.map((row) => ({
+            id: row.id,
+            node: (
+              <SessionExerciseCard
+                sessionId={session.id}
+                rowId={row.id}
+                exerciseId={row.exercise_id}
+                exerciseName={row.exercises?.name ?? "—"}
+                metricKind={(row.exercises?.metric_kind ?? "weight_reps") as MetricKind}
+                defaultRestSeconds={row.exercises?.default_rest_seconds ?? 90}
+                weightUnit={profile.units_weight}
+                // profile.units_distance is "m" | "km" | "mi" in the column type,
+                // but the settings UI only ever writes "km" or "mi".
+                distanceUnit={profile.units_distance === "mi" ? "mi" : "km"}
+                sets={row.sets ?? []}
+              />
+            ),
+          }))}
           onReorder={reorderAction}
-          renderItem={({ row }) => (
-            <SessionExerciseCard
-              sessionId={session.id}
-              rowId={row.id}
-              exerciseId={row.exercise_id}
-              exerciseName={row.exercises?.name ?? "—"}
-              metricKind={(row.exercises?.metric_kind ?? "weight_reps") as MetricKind}
-              defaultRestSeconds={row.exercises?.default_rest_seconds ?? 90}
-              weightUnit={profile.units_weight}
-              // profile.units_distance is "m" | "km" | "mi" in the column type,
-              // but the settings UI only ever writes "km" or "mi".
-              distanceUnit={profile.units_distance === "mi" ? "mi" : "km"}
-              sets={row.sets ?? []}
-            />
-          )}
         />
       )}
 

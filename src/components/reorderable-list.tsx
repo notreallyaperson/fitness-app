@@ -20,16 +20,15 @@ import { GripVertical } from "lucide-react";
 
 interface Item {
   id: string;
+  node: ReactNode;
 }
 
-export function ReorderableList<T extends Item>({
+export function ReorderableList({
   items,
   onReorder,
-  renderItem,
 }: {
-  items: T[];
+  items: Item[];
   onReorder: (idsInOrder: string[]) => Promise<void> | void;
-  renderItem: (item: T) => ReactNode;
 }) {
   const [order, setOrder] = useState(items);
   const [, startTransition] = useTransition();
@@ -63,7 +62,7 @@ export function ReorderableList<T extends Item>({
         <ul className="divide-y rounded-lg border">
           {order.map((item) => (
             <Row key={item.id} id={item.id}>
-              {renderItem(item)}
+              {item.node}
             </Row>
           ))}
         </ul>

@@ -69,25 +69,29 @@ export default async function TemplateEditorPage({
         <p className="text-sm text-muted-foreground">No exercises yet. Add one below.</p>
       ) : (
         <ReorderableList
-          items={rows.map((row) => ({ id: row.id, row }))}
+          items={rows.map((row) => ({
+            id: row.id,
+            node: (
+              <TemplateExerciseRow
+                templateId={t.id}
+                rowId={row.id}
+                exerciseName={row.exercises?.name ?? "—"}
+                metricKind={(row.exercises?.metric_kind ?? "weight_reps") as MetricKind}
+                defaults={{
+                  target_sets: row.target_sets,
+                  target_reps: row.target_reps,
+                  target_weight: row.target_weight ? Number(row.target_weight) : null,
+                  target_time_seconds: row.target_time_seconds,
+                  target_distance: row.target_distance
+                    ? Number(row.target_distance)
+                    : null,
+                  target_distance_unit: row.target_distance_unit,
+                  rest_seconds: row.rest_seconds,
+                }}
+              />
+            ),
+          }))}
           onReorder={reorderAction}
-          renderItem={({ row }) => (
-            <TemplateExerciseRow
-              templateId={t.id}
-              rowId={row.id}
-              exerciseName={row.exercises?.name ?? "—"}
-              metricKind={(row.exercises?.metric_kind ?? "weight_reps") as MetricKind}
-              defaults={{
-                target_sets: row.target_sets,
-                target_reps: row.target_reps,
-                target_weight: row.target_weight ? Number(row.target_weight) : null,
-                target_time_seconds: row.target_time_seconds,
-                target_distance: row.target_distance ? Number(row.target_distance) : null,
-                target_distance_unit: row.target_distance_unit,
-                rest_seconds: row.rest_seconds,
-              }}
-            />
-          )}
         />
       )}
 
