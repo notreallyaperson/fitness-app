@@ -66,6 +66,18 @@ export async function endSessionAction(id: string) {
   revalidatePath(`/sessions/${id}`);
 }
 
+/**
+ * (Re)start the session's overall timer from now: anchors started_at to the
+ * current time, clears any pauses, and reopens the session if it was ended.
+ * Logged sets are untouched.
+ */
+export async function restartSessionTimerAction(id: string) {
+  const nowIso = new Date().toISOString();
+  await setPauseIntervals(id, []);
+  await updateSession(id, { started_at: nowIso, ended_at: null });
+  revalidatePath(`/sessions/${id}`);
+}
+
 export async function deleteSessionAction(id: string) {
   await deleteSession(id);
   revalidatePath("/sessions");

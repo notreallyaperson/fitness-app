@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { format } from "date-fns";
+import { RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import {
   pauseSessionAction,
   resumeSessionAction,
   endSessionAction,
+  restartSessionTimerAction,
 } from "@/server/actions/sessions";
 
 interface Props {
@@ -51,11 +53,14 @@ export function SessionHeader({
 
   const paused = isPaused(pauseIntervals);
 
+  // Tick while the session isn't ended. We deliberately do NOT gate on `paused`
+  // here — the elapsed math already freezes during a genuine pause, and gating
+  // the interval on a possibly-stale `paused` flag could wrongly stop the clock.
   useEffect(() => {
-    if (endedAt || paused) return;
+    if (endedAt) return;
     const i = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(i);
-  }, [endedAt, paused]);
+  }, [endedAt]);
 
   const elapsed = activeElapsedSeconds({
     startedAt,
@@ -80,6 +85,20 @@ export function SessionHeader({
     startTransition(() => {
       void endSessionAction(sessionId);
     });
+
+  const restartTimer = (confirmFirst: boolean) => {
+    if (
+      confirmFirst &&
+      !window.confirm(
+        "Restart the session timer from now? Your logged sets are kept.",
+      )
+    ) {
+      return;
+    }
+    startTransition(() => {
+      void restartSessionTimerAction(sessionId);
+    });
+  };
 
   return (
     <header className="space-y-3 rounded-lg border border-border bg-elevated p-4 shadow-soft">
@@ -122,16 +141,38 @@ export function SessionHeader({
           >
             {endedAt ? "Total" : paused ? "Paused" : "Elapsed"}
           </span>
-          {!endedAt && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={togglePause}
-              className="ml-auto h-7"
-            >
-              {paused ? "Resume" : "Pause"}
-            </Button>
-          )}
+          <div className="ml-auto flex items-center gap-1.5">
+            {endedAt ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => restartTimer(false)}
+                className="h-7"
+              >
+                Start timer
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={togglePause}
+                  className="h-7"
+                >
+                  {paused ? "Resume" : "Pause"}
+                </Button>
+                <button
+                  type="button"
+                  aria-label="Restart timer"
+                  title="Restart timer"
+                  onClick={() => restartTimer(true)}
+                  className="flex size-7 items-center justify-center rounded-md border border-border-strong bg-card text-muted-foreground transition-transform duration-[120ms] ease-tap active:scale-95"
+                >
+                  <RotateCcw className="size-3.5" />
+                </button>
+              </>
+            )}
+          </div>
         </div>
         <Metric
           mono
