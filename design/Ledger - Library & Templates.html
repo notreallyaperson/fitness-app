@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ledger — Library & Template Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  :root, [data-theme="light"] {
+    --bg:0.962 0.008 85; --surface:0.984 0.007 85; --elevated:0.998 0.004 85; --inset:0.945 0.008 82;
+    --text-primary:0.245 0.006 75; --text-secondary:0.455 0.007 75; --text-muted:0.615 0.007 75; --text-faint:0.74 0.007 80;
+    --border:0.885 0.009 80; --border-strong:0.80 0.011 80;
+    --accent-volt:0.815 0.190 122; --accent-ember:0.700 0.150 65;
+    --on-volt:0.255 0.040 122; --on-ember:0.985 0.010 85;
+    --success:0.605 0.140 150; --destructive:0.575 0.185 28;
+    --sh-soft:0 2px 10px oklch(0.245 0.04 75 / 0.07), 0 1px 2px oklch(0.245 0.04 75 / 0.05);
+    --sh-cta:0 6px 22px oklch(0.245 0.04 75 / 0.10);
+  }
+  [data-theme="dark"] {
+    --bg:0.178 0.005 80; --surface:0.216 0.006 80; --elevated:0.258 0.007 80; --inset:0.150 0.005 80;
+    --text-primary:0.952 0.004 85; --text-secondary:0.722 0.006 82; --text-muted:0.560 0.007 82; --text-faint:0.44 0.008 82;
+    --border:0.305 0.007 82; --border-strong:0.40 0.009 82;
+    --accent-volt:0.855 0.200 122; --accent-ember:0.760 0.150 70;
+    --on-volt:0.205 0.040 122; --on-ember:0.180 0.030 70;
+    --success:0.745 0.150 150; --destructive:0.660 0.185 28;
+    --sh-soft:0 2px 12px oklch(0 0 0 / 0.45), 0 1px 2px oklch(0 0 0 / 0.40);
+    --sh-cta:0 6px 22px oklch(0 0 0 / 0.5);
+  }
+  [data-accent="volt"]  { --accent:var(--accent-volt);  --on-accent:var(--on-volt); }
+  [data-accent="ember"] { --accent:var(--accent-ember); --on-accent:var(--on-ember); }
+  *{-webkit-font-smoothing:antialiased; box-sizing:border-box;}
+  body{ background:oklch(0.93 0.006 80); font-family:'Inter',system-ui,sans-serif; font-variant-numeric:tabular-nums slashed-zero; }
+  .c{ color:oklch(var(--text-primary)); }
+  .metric{ font-variant-numeric:tabular-nums slashed-zero; letter-spacing:-0.04em; font-weight:600; line-height:0.92; }
+  .mono{ font-family:'JetBrains Mono',ui-monospace,monospace; }
+  .scroll::-webkit-scrollbar{ width:0; height:0; }
+  input{ font-family:inherit; outline:none; background:transparent; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+const T=(k)=>`oklch(var(--${k}))`;
+const mix=(k,p,base='surface')=>`color-mix(in oklab, ${T(k)} ${p}%, ${T(base)})`;
+const svg=(d,s=20,sw=1.85)=>(p)=><svg width={p.s||s} height={p.s||s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={p.sw||sw} strokeLinecap="round" strokeLinejoin="round" style={p.style}>{d}</svg>;
+const I={
+  search:svg(<g><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></g>),
+  back:svg(<path d="M19 12H5M12 19l-7-7 7-7"/>),
+  chev:svg(<path d="m9 18 6-6-6-6"/>),
+  plus:svg(<path d="M12 5v14M5 12h14"/>),
+  check:svg(<path d="M20 6 9 17l-5-5"/>),
+  star:svg(<path d="M12 3.2l2.5 5.3 5.8.7-4.3 4 1.1 5.7L12 16.3 6.9 18.9 8 13.2 3.7 9.2l5.8-.7z"/>),
+  grip:(p)=><svg width={p.s||18} height={p.s||18} viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg>,
+  dots:(p)=><svg width={p.s||20} height={p.s||20} viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>,
+  clock:svg(<g><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></g>),
+  home:svg(<path d="m3 9.5 9-7 9 7V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>),
+  layers:svg(<g><path d="m12 2.5 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5"/></g>),
+  sliders:svg(<g><path d="M20 7h-7M9 7H4M20 17h-4M12 17H4"/><circle cx="11" cy="7" r="2.2"/><circle cx="14" cy="17" r="2.2"/></g>),
+  barbell:svg(<g><path d="M4 8v8M7 6v12M17 6v12M20 8v8M7 12h10"/></g>),
+  dumbbell:svg(<g><path d="M6 8v8M3 10v4M18 8v8M21 10v4M6 12h12"/></g>),
+  body:svg(<g><circle cx="12" cy="5.5" r="2.6"/><path d="M6 21v-1.5a6 6 0 0 1 12 0V21"/></g>),
+  cable:svg(<g><path d="M7 3v3a5 5 0 0 0 10 0V3"/><path d="M12 11v9"/></g>),
+  award:svg(<g><circle cx="12" cy="9" r="5.5"/><path d="M8.6 13.8 7.2 21l4.8-2.6L16.8 21l-1.4-7.2"/></g>),
+};
+const EqIcon=({k,s=16})=>({barbell:<I.barbell s={s}/>,dumbbell:<I.dumbbell s={s}/>,bodyweight:<I.body s={s}/>,cable:<I.cable s={s}/>}[k]);
+
+function StatusBar(){
+  return (
+    <div className="relative h-[50px] shrink-0 flex items-end justify-between px-7 pb-1.5">
+      <span className="text-[15px] font-semibold c">9:41</span>
+      <div className="absolute left-1/2 -translate-x-1/2 top-[11px] w-[112px] h-[30px] rounded-full" style={{background:'#000'}}/>
+      <div className="flex items-center gap-1.5 c">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4.5" width="3" height="7.5" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity="0.35"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1" width="20" height="10" rx="3" stroke="currentColor" strokeOpacity="0.5"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><rect x="22" y="4" width="1.5" height="4" rx="0.75" fill="currentColor" fillOpacity="0.5"/></svg>
+      </div>
+    </div>
+  );
+}
+function TabBar({active}){
+  const tabs=[['Home',I.home],['Library',I.layers],['Start',null],['History',I.clock],['Settings',I.sliders]];
+  return (
+    <div className="flex items-stretch px-2 pt-2 pb-7 shrink-0" style={{background:T('elevated'), borderTop:`1px solid ${T('border')}`}}>
+      {tabs.map(([l,Ic])=> !Ic ? (
+        <div key={l} className="flex-1 flex justify-center"><button className="w-[52px] h-[52px] -mt-4 rounded-full flex items-center justify-center" style={{background:T('accent'), color:T('on-accent'), boxShadow:'var(--sh-cta)'}}><I.plus s={24}/></button></div>
+      ):(
+        <button key={l} className="flex-1 flex flex-col items-center gap-1 py-0.5" style={{color: active===l?T('accent'):T('text-muted')}}><Ic s={23}/><span className="text-[10px] font-semibold">{l}</span></button>
+      ))}
+    </div>
+  );
+}
+
+/* =================== A1 · LIBRARY LIST =================== */
+const LIB=[
+  ['B',[['Barbell Bench Press','Chest','barbell'],['Barbell Row','Back','barbell'],['Bicep Curl','Biceps','dumbbell']]],
+  ['C',[['Cable Fly','Chest','cable']]],
+  ['D',[['Deadlift','Back','barbell'],['Dumbbell Shoulder Press','Shoulders','dumbbell']]],
+  ['P',[['Plank','Core','bodyweight'],['Pull-Up','Back','bodyweight']]],
+  ['S',[['Squat','Legs','barbell']]],
+];
+function Chip({children, active, icon}){
+  return (
+    <button className="inline-flex items-center gap-1.5 h-[34px] px-3.5 rounded-full text-[13px] font-semibold shrink-0"
+      style={active?{background:T('accent'), color:T('on-accent')}:{background:T('surface'), color:T('text-secondary'), border:`1px solid ${T('border')}`}}>
+      {icon}{children}
+    </button>
+  );
+}
+function LibraryList(){
+  return (
+    <div className="h-full flex flex-col">
+      <StatusBar/>
+      <div className="px-5 pt-1 pb-3 shrink-0">
+        <div className="flex items-center justify-between mb-3.5">
+          <h1 className="text-[27px] font-bold c" style={{letterSpacing:'-0.03em'}}>Library</h1>
+          <button className="w-9 h-9 rounded-full flex items-center justify-center" style={{background:T('surface'), color:T('text-secondary'), border:`1px solid ${T('border')}`}}><I.plus s={19}/></button>
+        </div>
+        <div className="flex items-center gap-2 h-[44px] px-3.5 rounded-[12px] mb-3" style={{background:T('inset'), border:`1px solid ${T('border')}`}}>
+          <span style={{color:T('text-muted')}}><I.search s={18}/></span>
+          <input placeholder="Search exercises" className="flex-1 text-[14px] c"/>
+        </div>
+      </div>
+      <div className="flex gap-2 px-5 pb-3 overflow-x-auto scroll shrink-0">
+        <Chip icon={<I.sliders s={14}/>}>Filters</Chip>
+        <Chip active>Chest</Chip><Chip>Back</Chip><Chip>Legs</Chip><Chip>Barbell</Chip><Chip>Dumbbell</Chip>
+      </div>
+      <div className="scroll flex-1 overflow-y-auto px-5 pb-4">
+        {LIB.map(([letter,rows])=>(
+          <div key={letter} className="mb-2">
+            <div className="text-[12px] font-bold tracking-[0.1em] mt-2 mb-1.5 px-1" style={{color:T('text-faint')}}>{letter}</div>
+            <div className="rounded-[14px] overflow-hidden" style={{background:T('surface'), border:`1px solid ${T('border')}`}}>
+              {rows.map((r,i)=>(
+                <div key={r[0]} className="flex items-center gap-3 px-3.5 h-[58px]" style={i?{borderTop:`1px solid ${T('border')}`}:{}}>
+                  <div className="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0" style={{background:T('inset'), color:T('text-secondary')}}><EqIcon k={r[2]} s={18}/></div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[14px] font-semibold c truncate">{r[0]}</div>
+                    <div className="mt-0.5"><span className="text-[11px] font-semibold px-1.5 py-0.5 rounded" style={{background:T('inset'), color:T('text-secondary')}}>{r[1]}</span></div>
+                  </div>
+                  <span style={{color:T('text-faint')}}><I.chev s={18}/></span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <TabBar active="Library"/>
+    </div>
+  );
+}
+
+/* =================== A2 · LIBRARY DETAIL =================== */
+function DetailHeader({title}){
+  return (
+    <div className="flex items-center justify-between px-3 py-2 shrink-0">
+      <button className="w-9 h-9 rounded-full flex items-center justify-center" style={{color:T('text-secondary')}}><I.back s={20}/></button>
+      <span className="text-[15px] font-bold c truncate px-2">{title}</span>
+      <button className="w-9 h-9 rounded-full flex items-center justify-center" style={{color:T('text-faint')}}><I.star s={20}/></button>
+    </div>
+  );
+}
+function LibraryDetail(){
+  const hist=[['May 28','80 kg × 8',true],['May 24','80 kg × 8',false],['May 19','77.5 kg × 8',false]];
+  return (
+    <div className="h-full flex flex-col">
+      <StatusBar/>
+      <DetailHeader title="Bench Press"/>
+      <div className="scroll flex-1 overflow-y-auto px-5 pt-2 pb-4">
+        {/* hero */}
+        <div className="flex items-center gap-3.5 mb-5">
+          <div className="w-14 h-14 rounded-[16px] flex items-center justify-center shrink-0" style={{background:T('inset'), color:T('text-secondary')}}><I.barbell s={26}/></div>
+          <div>
+            <h1 className="text-[24px] font-bold c" style={{letterSpacing:'-0.025em', lineHeight:1.05}}>Barbell Bench Press</h1>
+            <div className="text-[12.5px] font-semibold mt-1" style={{color:T('text-muted')}}>Weight × Reps · Barbell</div>
+          </div>
+        </div>
+
+        {/* worked muscles */}
+        <div className="text-[12px] font-bold tracking-[0.08em] uppercase mb-2 px-0.5" style={{color:T('text-faint')}}>Worked muscles</div>
+        <div className="rounded-[14px] p-4 mb-5" style={{background:T('surface'), border:`1px solid ${T('border')}`}}>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[12px] font-semibold" style={{color:T('text-muted')}}>Primary</span>
+            <span className="text-[13px] font-bold c">Chest</span>
+          </div>
+          <div className="flex items-start justify-between pt-3" style={{borderTop:`1px solid ${T('border')}`}}>
+            <span className="text-[12px] font-semibold" style={{color:T('text-muted')}}>Secondary</span>
+            <div className="flex flex-wrap gap-1.5 justify-end max-w-[60%]">
+              {['Triceps','Front Delts'].map(m=><span key={m} className="text-[11.5px] font-semibold px-2 py-0.5 rounded" style={{background:T('inset'), color:T('text-secondary')}}>{m}</span>)}
+            </div>
+          </div>
+        </div>
+
+        {/* last 3 sessions */}
+        <div className="flex items-center justify-between mb-2 px-0.5">
+          <span className="text-[12px] font-bold tracking-[0.08em] uppercase" style={{color:T('text-faint')}}>Last 3 sessions</span>
+          <span className="flex items-center gap-1 text-[11.5px] font-bold" style={{color:T('accent')}}><I.award s={13}/>PB 82.5 × 6</span>
+        </div>
+        <div className="rounded-[14px] overflow-hidden mb-2" style={{background:T('surface'), border:`1px solid ${T('border')}`}}>
+          {hist.map(([d,res,pb],i)=>(
+            <div key={d} className="flex items-center justify-between px-4 py-3" style={i?{borderTop:`1px solid ${T('border')}`}:{}}>
+              <div className="text-[13px] font-medium" style={{color:T('text-secondary')}}>{d}</div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-semibold" style={{color:T('text-faint')}}>top set</span>
+                <span className="metric text-[20px] c">{res}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* actions */}
+      <div className="px-5 pb-7 pt-2 shrink-0 space-y-2.5" style={{background:`linear-gradient(to top, ${T('bg')} 78%, transparent)`}}>
+        <button className="w-full h-[52px] rounded-[14px] text-[15px] font-semibold flex items-center justify-center gap-2" style={{background:T('accent'), color:T('on-accent'), boxShadow:'var(--sh-cta)'}}><I.plus s={19}/>Add to Session</button>
+        <button className="w-full h-[48px] rounded-[14px] text-[14px] font-semibold" style={{background:T('surface'), color:T('text-primary'), border:`1.5px solid ${T('border-strong')}`}}>Add to Template</button>
+      </div>
+    </div>
+  );
+}
+
+/* =================== B · TEMPLATE EDITOR =================== */
+function TargetStat({val, unit, label}){
+  return (
+    <div className="flex flex-col">
+      <div className="flex items-baseline gap-0.5">
+        <span className="metric text-[17px] c">{val}</span>
+        {unit && <span className="text-[10px] font-semibold" style={{color:T('text-muted')}}>{unit}</span>}
+      </div>
+      <span className="text-[9.5px] font-bold tracking-[0.06em] uppercase mt-0.5" style={{color:T('text-faint')}}>{label}</span>
+    </div>
+  );
+}
+function TemplateEditor(){
+  const ex=[
+    ['Barbell Bench Press','Weight × Reps','4','8','80kg','90s'],
+    ['Incline Dumbbell Press','Weight × Reps','3','10','28kg','75s'],
+    ['Cable Fly','Weight × Reps','3','12','15kg','60s'],
+    ['Triceps Pushdown','Weight × Reps','3','15','25kg','45s'],
+  ];
+  return (
+    <div className="h-full flex flex-col">
+      <StatusBar/>
+      <div className="flex items-center justify-between px-3 py-2 shrink-0">
+        <button className="text-[14px] font-semibold px-2" style={{color:T('text-secondary')}}>Cancel</button>
+        <span className="text-[15px] font-bold c">Edit Template</span>
+        <button className="text-[14px] font-semibold px-2" style={{color:T('text-faint')}}>Done</button>
+      </div>
+      <div className="scroll flex-1 overflow-y-auto px-5 pt-2 pb-4">
+        {/* name */}
+        <label className="text-[11px] font-bold tracking-[0.08em] uppercase block mb-1.5 px-0.5" style={{color:T('text-faint')}}>Template name</label>
+        <input defaultValue="Push Day A" className="w-full h-[52px] px-4 rounded-[13px] text-[18px] font-bold c mb-2" style={{background:T('surface'), border:`1px solid ${T('border')}`, letterSpacing:'-0.01em'}}/>
+        <div className="flex items-center gap-3 mb-5 px-1 text-[12px] font-medium" style={{color:T('text-muted')}}>
+          <span>{ex.length} exercises</span><span>·</span><span className="flex items-center gap-1"><I.clock s={13}/>~52 min</span>
+        </div>
+
+        <div className="text-[12px] font-bold tracking-[0.08em] uppercase mb-2 px-0.5" style={{color:T('text-faint')}}>Exercises</div>
+        {ex.map((e,idx)=>(
+          <div key={e[0]} className="rounded-[14px] mb-2.5 px-3 py-3 flex items-center gap-2.5" style={{background:T('elevated'), border:`1px solid ${T('border')}`, boxShadow:'var(--sh-soft)'}}>
+            <span className="shrink-0 cursor-grab" style={{color:T('text-faint')}}><I.grip s={18}/></span>
+            <div className="flex-1 min-w-0">
+              <div className="text-[14.5px] font-bold c truncate" style={{letterSpacing:'-0.01em'}}>{e[0]}</div>
+              <div className="flex items-center gap-4 mt-2">
+                <TargetStat val={`${e[2]}×${e[3]}`} label="Sets × Reps"/>
+                <div style={{width:1, height:26, background:T('border')}}/>
+                <TargetStat val={e[4]} label="Target"/>
+                <div style={{width:1, height:26, background:T('border')}}/>
+                <TargetStat val={e[5]} label="Rest"/>
+              </div>
+            </div>
+            <button className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 self-start" style={{color:T('text-faint')}}><I.dots s={18}/></button>
+          </div>
+        ))}
+      </div>
+      {/* actions */}
+      <div className="px-5 pb-7 pt-2 shrink-0 space-y-2.5" style={{background:`linear-gradient(to top, ${T('bg')} 78%, transparent)`}}>
+        <button className="w-full h-[48px] rounded-[14px] text-[14px] font-semibold flex items-center justify-center gap-2" style={{background:T('surface'), color:T('text-primary'), border:`1.5px solid ${T('border-strong')}`}}><I.plus s={18}/>Add exercise</button>
+        <button className="w-full h-[52px] rounded-[14px] text-[15px] font-semibold flex items-center justify-center gap-2" style={{background:T('accent'), color:T('on-accent'), boxShadow:'var(--sh-cta)'}}><I.check s={19}/>Save Template</button>
+      </div>
+    </div>
+  );
+}
+
+/* =================== frame + app =================== */
+function Phone({mode, accent, label, children}){
+  return (
+    <div data-theme={mode} data-accent={accent} className="shrink-0">
+      <div className="text-[10px] font-semibold tracking-[0.16em] uppercase mb-3 text-center" style={{color:'oklch(0.5 0.007 75)'}}>{mode}</div>
+      <div className="rounded-[46px] p-[5px]" style={{background: mode==='dark'?'#2a2a28':'#dcd7ce', boxShadow:'0 26px 54px oklch(0.245 0.04 75 / 0.16)'}}>
+        <div className="rounded-[41px] overflow-hidden" style={{width:390, height:844, background:T('bg')}}>{children}</div>
+      </div>
+    </div>
+  );
+}
+function ScreenBlock({tag, title, desc, accent, render}){
+  return (
+    <section className="mb-16">
+      <div className="max-w-[920px] mx-auto px-6 mb-5">
+        <div className="flex items-baseline gap-3">
+          <span className="metric text-[15px]" style={{color:'oklch(0.62 0.18 122)'}}>{tag}</span>
+          <h2 className="text-[20px] font-bold" style={{letterSpacing:'-0.02em', color:'oklch(0.245 0.006 75)'}}>{title}</h2>
+        </div>
+        <p className="text-[12.5px] mt-1 ml-7 max-w-[64ch]" style={{color:'oklch(0.5 0.007 75)'}}>{desc}</p>
+      </div>
+      <div className="flex flex-wrap gap-8 justify-center px-6">
+        <Phone mode="light" accent={accent}>{render()}</Phone>
+        <Phone mode="dark" accent={accent}>{render()}</Phone>
+      </div>
+    </section>
+  );
+}
+function App(){
+  const [accent,setAccent]=useState('volt');
+  return (
+    <div className="min-h-screen pb-20">
+      <header className="max-w-[920px] mx-auto px-6 pt-8 pb-8 flex items-center justify-between">
+        <div className="flex items-baseline gap-2.5">
+          <span className="metric text-[19px]" style={{color:'oklch(0.245 0.006 75)'}}>L</span>
+          <span className="text-[14px] font-bold tracking-[0.18em]" style={{color:'oklch(0.245 0.006 75)'}}>LEDGER</span>
+          <span className="text-[12px] ml-1" style={{color:'oklch(0.5 0.007 75)'}}>Library & Template Editor</span>
+        </div>
+        <div className="inline-flex rounded-[6px] p-[3px]" style={{background:'oklch(0.98 0.006 80)', border:'1px solid oklch(0.86 0.009 80)'}}>
+          {[['Volt','volt'],['Ember','ember']].map(([l,v])=>(
+            <button key={v} onClick={()=>setAccent(v)} className="px-3 py-1.5 rounded-[4px] text-[12px] font-semibold" style={accent===v?{background:'oklch(0.245 0.006 75)', color:'oklch(0.96 0.008 85)'}:{color:'oklch(0.45 0.007 75)'}}>{l}</button>
+          ))}
+        </div>
+      </header>
+      <ScreenBlock tag="A1" title="Exercise Library — List" accent={accent} render={()=><LibraryList/>}
+        desc="Search, horizontally-scrolling filter chips (one active in the accent), and alphabetised rows: equipment glyph, name, muscle tag, chevron."/>
+      <ScreenBlock tag="A2" title="Exercise Library — Detail" accent={accent} render={()=><LibraryDetail/>}
+        desc="Worked-muscle taxonomy (primary/secondary tags rather than an anatomy drawing), last-3-sessions mini history with top-set numerals + a PB marker, and bottom-anchored add actions."/>
+      <ScreenBlock tag="B" title="Template Editor" accent={accent} render={()=><TemplateEditor/>}
+        desc="Big name field, reorderable exercise rows with drag handles and a compact sets×reps / target / rest readout, and bottom-anchored Add + Save."/>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

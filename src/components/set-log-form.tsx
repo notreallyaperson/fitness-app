@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { NumberStepper } from "@/components/ui/number-stepper";
 import { cn } from "@/lib/utils";
 import type { MetricKind } from "@/lib/types/domain";
 import { appendSetAction } from "@/server/actions/sessions";
@@ -58,6 +59,10 @@ export function SetLogForm({
   const [warmup, setWarmup] = useState(false);
   const [, startTransition] = useTransition();
 
+  const fieldCount = [f.weight, f.reps, f.time, f.distance].filter(
+    Boolean,
+  ).length;
+
   const submit = () => {
     const payload = {
       reps: reps ? Number(reps) : null,
@@ -88,40 +93,62 @@ export function SetLogForm({
   };
 
   return (
-    <div className="space-y-2 rounded-md border p-2">
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {f.weight && (
-          <Field
-            label={`Weight (${defaultWeightUnit})`}
-            value={weight}
-            onChange={setWeight}
-            step="0.5"
-          />
-        )}
-        {f.reps && <Field label="Reps" value={reps} onChange={setReps} />}
-        {f.time && <Field label="Time (s)" value={time} onChange={setTime} />}
-        {f.distance && (
-          <Field
-            label={`Distance (${defaultDistanceUnit})`}
-            value={distance}
-            onChange={setDistance}
-            step="0.01"
-          />
-        )}
-        <label className="flex items-center gap-2 text-xs">
-          <Switch checked={warmup} onCheckedChange={setWarmup} id="warmup" />
-          <Label htmlFor="warmup">Warmup</Label>
-        </label>
-      </div>
+    <div className="space-y-2.5 rounded-md border border-dashed border-border-strong bg-card p-2.5">
+      {fieldCount > 0 && (
+        <div
+          className={cn(
+            "grid gap-2",
+            fieldCount === 1 ? "grid-cols-1" : "grid-cols-2",
+          )}
+        >
+          {f.weight && (
+            <NumberStepper
+              label={`Weight (${defaultWeightUnit})`}
+              value={weight}
+              onChange={setWeight}
+              step={2.5}
+            />
+          )}
+          {f.reps && (
+            <NumberStepper label="Reps" value={reps} onChange={setReps} step={1} />
+          )}
+          {f.time && (
+            <NumberStepper
+              label="Time (s)"
+              value={time}
+              onChange={setTime}
+              step={5}
+            />
+          )}
+          {f.distance && (
+            <NumberStepper
+              label={`Distance (${defaultDistanceUnit})`}
+              value={distance}
+              onChange={setDistance}
+              step={0.5}
+            />
+          )}
+        </div>
+      )}
+
+      <label className="flex items-center justify-between rounded-md bg-muted px-3 py-2">
+        <Label htmlFor="warmup" className="text-sm text-muted-foreground">
+          Warmup set
+        </Label>
+        <Switch checked={warmup} onCheckedChange={setWarmup} id="warmup" />
+      </label>
+
       <RpeSelector value={rpe} onChange={setRpe} />
+
       <Input
         type="text"
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         placeholder="Note (optional)"
-        className="text-xs"
+        className="h-10 bg-muted text-sm"
       />
-      <Button onClick={submit} className="w-full">
+
+      <Button onClick={submit} className="h-11 w-full rounded-md text-sm">
         Log set
       </Button>
     </div>
@@ -136,9 +163,9 @@ function RpeSelector({
   onChange: (v: number | null) => void;
 }) {
   return (
-    <div className="flex flex-col gap-1">
-      <span className="text-[11px] text-muted-foreground">RPE</span>
-      <div className="grid grid-cols-4 gap-1">
+    <div className="flex flex-col gap-1.5">
+      <span className="text-[11px] tracking-wide text-muted-foreground">RPE</span>
+      <div className="grid grid-cols-4 gap-1.5">
         {RPE_OPTIONS.map((opt) => {
           const selected = value === opt.value;
           return (
@@ -148,10 +175,10 @@ function RpeSelector({
               aria-pressed={selected}
               onClick={() => onChange(selected ? null : opt.value)}
               className={cn(
-                "rounded-md border py-1.5 text-xs transition-colors",
+                "rounded-md border py-2 text-xs font-medium transition-all duration-[120ms] ease-tap active:scale-[0.97]",
                 selected
                   ? "border-primary bg-primary text-primary-foreground"
-                  : "bg-background hover:bg-muted",
+                  : "border-border-strong bg-card hover:bg-muted",
               )}
             >
               {opt.label}
@@ -159,34 +186,9 @@ function RpeSelector({
           );
         })}
       </div>
-      <span className="text-[10px] text-muted-foreground">
+      <span className="text-[10px] text-faint">
         Easy = reps left · Max = failure
       </span>
     </div>
-  );
-}
-
-function Field({
-  label,
-  value,
-  onChange,
-  step,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  step?: string;
-}) {
-  return (
-    <label className="flex flex-col gap-1">
-      <span className="text-[11px] text-muted-foreground">{label}</span>
-      <Input
-        type="number"
-        inputMode="decimal"
-        step={step ?? "1"}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      />
-    </label>
   );
 }

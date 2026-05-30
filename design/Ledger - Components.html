@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-accent="volt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ledger — Component Spec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  :root, [data-theme="light"] {
+    --bg:            oklch(0.962 0.008 85);
+    --surface:       oklch(0.984 0.007 85);
+    --elevated:      oklch(0.998 0.004 85);
+    --text-primary:  oklch(0.245 0.006 75);
+    --text-secondary:oklch(0.455 0.007 75);
+    --text-muted:    oklch(0.615 0.007 75);
+    --border:        oklch(0.885 0.009 80);
+    --border-strong: oklch(0.80 0.011 80);
+    --accent-volt:   oklch(0.815 0.190 122);
+    --accent-ember:  oklch(0.700 0.150 65);
+    --on-volt:       oklch(0.255 0.040 122);
+    --on-ember:      oklch(0.985 0.010 85);
+    --success:       oklch(0.605 0.140 150);
+    --warning:       oklch(0.780 0.130 85);
+    --destructive:   oklch(0.575 0.185 28);
+    --on-destructive:oklch(0.985 0.01 28);
+    --shadow-inset:  0 1px 1px oklch(0.245 0.02 75 / 0.04);
+    --shadow-soft:   0 2px 10px oklch(0.245 0.04 75 / 0.07), 0 1px 2px oklch(0.245 0.04 75 / 0.05);
+    --shadow-sheet:  0 -10px 40px oklch(0.245 0.05 75 / 0.10);
+  }
+  [data-theme="dark"] {
+    --bg:            oklch(0.178 0.005 80);
+    --surface:       oklch(0.216 0.006 80);
+    --elevated:      oklch(0.258 0.007 80);
+    --text-primary:  oklch(0.952 0.004 85);
+    --text-secondary:oklch(0.722 0.006 82);
+    --text-muted:    oklch(0.560 0.007 82);
+    --border:        oklch(0.305 0.007 82);
+    --border-strong: oklch(0.40 0.009 82);
+    --accent-volt:   oklch(0.855 0.200 122);
+    --accent-ember:  oklch(0.760 0.150 70);
+    --on-volt:       oklch(0.205 0.040 122);
+    --on-ember:      oklch(0.180 0.030 70);
+    --success:       oklch(0.745 0.150 150);
+    --warning:       oklch(0.835 0.130 88);
+    --destructive:   oklch(0.660 0.185 28);
+    --on-destructive:oklch(0.150 0.02 28);
+    --shadow-inset:  0 1px 1px oklch(0 0 0 / 0.30);
+    --shadow-soft:   0 2px 12px oklch(0 0 0 / 0.45), 0 1px 2px oklch(0 0 0 / 0.40);
+    --shadow-sheet:  0 -10px 44px oklch(0 0 0 / 0.55);
+  }
+  [data-accent="volt"]  { --accent: var(--accent-volt);  --on-accent: var(--on-volt); }
+  [data-accent="ember"] { --accent: var(--accent-ember); --on-accent: var(--on-ember); }
+
+  * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
+  body {
+    background: var(--page);
+    --page: oklch(0.93 0.006 80);
+    color: oklch(0.245 0.006 75);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-variant-numeric: tabular-nums slashed-zero;
+  }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .tnum { font-variant-numeric: tabular-nums slashed-zero; }
+  .metric { font-variant-numeric: tabular-nums slashed-zero; letter-spacing:-0.04em; font-weight:600; line-height:0.92; }
+  input { font-family: inherit; }
+  input:focus { outline: none; }
+  ::selection { background: var(--accent-volt); color: var(--on-volt); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useContext, createContext } = React;
+const AccentCtx = createContext('volt');
+
+/* ---------- icons (lucide-style, currentColor) ---------- */
+const svg = (d, s=20, sw=1.85) => (props) => (
+  <svg width={props.s||s} height={props.s||s} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth={props.sw||sw} strokeLinecap="round" strokeLinejoin="round" style={props.style}>{d}</svg>
+);
+const I = {
+  chevron:  svg(<path d="m9 18 6-6-6-6"/>),
+  plus:     svg(<path d="M12 5v14M5 12h14"/>),
+  minus:    svg(<path d="M5 12h14"/>),
+  check:    svg(<path d="M20 6 9 17l-5-5"/>),
+  x:        svg(<path d="M18 6 6 18M6 6l12 12"/>),
+  home:     svg(<g><path d="m3 9.5 9-7 9 7V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></g>),
+  dumbbell: svg(<g><path d="M6 7v10M3 9.5v5M18 7v10M21 9.5v5M6 12h12"/></g>),
+  clock:    svg(<g><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></g>),
+  sliders:  svg(<g><path d="M20 7h-7M9 7H4M20 17h-4M12 17H4"/><circle cx="11" cy="7" r="2.2"/><circle cx="14" cy="17" r="2.2"/></g>),
+  flame:    svg(<path d="M12 3c.6 2.2 2.7 3.2 2.7 6.2A2.7 2.7 0 0 1 9.3 9.4c0-.9.4-1.5.4-1.5.6 1.4 2.1.9 2.1-1.1 0-1.6-1-2.6 0-3.8z"/>),
+  award:    svg(<g><circle cx="12" cy="9" r="5.5"/><path d="M8.6 13.8 7.2 21l4.8-2.6L16.8 21l-1.4-7.2"/></g>),
+  search:   svg(<g><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></g>),
+  layers:   svg(<g><path d="m12 2.5 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5"/></g>),
+  barbell:  svg(<g><path d="M4 8v8M7 6v12M17 6v12M20 8v8M7 12h10"/></g>),
+};
+
+/* ---------- shell ---------- */
+function Group({n, title, desc, children}) {
+  return (
+    <section className="mb-16">
+      <div className="flex items-baseline gap-3 mb-1">
+        <span className="metric text-[15px]" style={{color:'oklch(0.62 0.18 122)'}}>{n}</span>
+        <h2 className="text-[19px] font-bold" style={{letterSpacing:'-0.02em', color:'oklch(0.245 0.006 75)'}}>{title}</h2>
+      </div>
+      {desc && <p className="text-[12.5px] mb-5 ml-7 max-w-[70ch]" style={{color:'oklch(0.5 0.007 75)'}}>{desc}</p>}
+      <div className="ml-0 sm:ml-7">{children}</div>
+    </section>
+  );
+}
+/* render the SAME children once per mode, side by side */
+function Modes({children, pad=true}) {
+  const accent = useContext(AccentCtx);
+  return (
+    <div className="grid sm:grid-cols-2 gap-4">
+      {['light','dark'].map(mode=>(
+        <div key={mode} data-theme={mode} data-accent={accent}
+          className="rounded-[18px] overflow-hidden relative" style={{background:'var(--bg)', border:'1px solid var(--border)'}}>
+          <div className="absolute top-2.5 right-3 text-[9.5px] font-semibold tracking-[0.16em] uppercase z-10" style={{color:'var(--text-muted)'}}>{mode}</div>
+          <div className={pad?'p-5 pt-7':''}>{children}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+function Note({children}) {
+  return <div className="text-[10px] font-semibold tracking-[0.1em] uppercase mb-2.5" style={{color:'var(--text-muted)'}}>{children}</div>;
+}
+
+/* ============================== BUTTONS ============================== */
+function PressBtn({children, variant='primary', disabled, full}) {
+  const [p,setP] = useState(false);
+  const base = {
+    transition:'transform 120ms cubic-bezier(0.2,0,0,1), background 120ms, opacity 120ms',
+    transform: p && !disabled ? 'scale(0.97)':'scale(1)',
+    opacity: disabled ? 0.4 : 1,
+    cursor: disabled ? 'not-allowed':'pointer',
+  };
+  const styles = {
+    primary:    {background: p?'color-mix(in oklab, var(--accent) 86%, black)':'var(--accent)', color:'var(--on-accent)'},
+    secondary:  {background:'var(--surface)', color:'var(--text-primary)', border:'1px solid var(--border-strong)'},
+    ghost:      {background: p?'color-mix(in oklab, var(--text-primary) 8%, transparent)':'transparent', color:'var(--text-primary)'},
+    destructive:{background: p?'color-mix(in oklab, var(--destructive) 86%, black)':'var(--destructive)', color:'var(--on-destructive)'},
+  }[variant];
+  return (
+    <button disabled={disabled}
+      onMouseDown={()=>setP(true)} onMouseUp={()=>setP(false)} onMouseLeave={()=>setP(false)}
+      onTouchStart={()=>setP(true)} onTouchEnd={()=>setP(false)}
+      className={`${full?'w-full':''} h-[52px] px-5 rounded-[14px] text-[15px] font-semibold flex items-center justify-center gap-2`}
+      style={{...base, ...styles}}>{children}</button>
+  );
+}
+function ButtonsDemo() {
+  return (
+    <div className="space-y-5">
+      <div>
+        <Note>Primary · full-width, bottom-anchored</Note>
+        <PressBtn variant="primary" full>Start Workout</PressBtn>
+        <div className="flex gap-2 mt-2 text-[10px] mono" style={{color:'var(--text-muted)'}}><span>default</span><span>·</span><span>press → scale .97 + darken</span></div>
+      </div>
+      <div className="grid grid-cols-2 gap-2.5">
+        <div><Note>Secondary</Note><PressBtn variant="secondary" full>Add Exercise</PressBtn></div>
+        <div><Note>Ghost</Note><PressBtn variant="ghost" full>Skip</PressBtn></div>
+      </div>
+      <div className="grid grid-cols-2 gap-2.5 items-end">
+        <div><Note>Destructive</Note><PressBtn variant="destructive" full>End Session</PressBtn></div>
+        <div><Note>Disabled</Note><PressBtn variant="primary" full disabled>Start Workout</PressBtn></div>
+      </div>
+      <div>
+        <Note>Icon button · 44px</Note>
+        <div className="flex gap-2.5 items-center">
+          <IconBtn><I.plus s={20}/></IconBtn>
+          <IconBtn><I.sliders s={20}/></IconBtn>
+          <IconBtn><I.search s={20}/></IconBtn>
+          <IconBtn accent><I.check s={20}/></IconBtn>
+        </div>
+      </div>
+    </div>
+  );
+}
+function IconBtn({children, accent}) {
+  const [p,setP] = useState(false);
+  return (
+    <button onMouseDown={()=>setP(true)} onMouseUp={()=>setP(false)} onMouseLeave={()=>setP(false)}
+      className="w-11 h-11 rounded-[12px] flex items-center justify-center"
+      style={{
+        background: accent ? 'var(--accent)' : 'var(--surface)',
+        color: accent ? 'var(--on-accent)' : 'var(--text-primary)',
+        border: accent ? 'none' : '1px solid var(--border-strong)',
+        transform: p?'scale(0.94)':'scale(1)', transition:'transform 120ms'
+      }}>{children}</button>
+  );
+}
+
+/* ============================== CARDS ============================== */
+function CardsDemo() {
+  return (
+    <div className="space-y-3">
+      <Note>Standard content card</Note>
+      <div className="rounded-[14px] p-5" style={{background:'var(--surface)', border:'1px solid var(--border)', boxShadow:'var(--shadow-soft)'}}>
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-[11px] font-semibold tracking-[0.1em] uppercase mb-1.5" style={{color:'var(--text-muted)'}}>This week</div>
+            <div className="text-[16px] font-bold">Volume lifted</div>
+          </div>
+          <span className="px-2 py-1 rounded-full text-[11px] font-semibold flex items-center gap-1" style={{background:'color-mix(in oklab, var(--success) 16%, var(--surface))', color:'var(--success)'}}>
+            <I.flame s={12}/> 12-day streak
+          </span>
+        </div>
+        <div className="flex items-baseline mt-4" style={{gap:'8px'}}>
+          <span className="metric text-[48px]">48,250</span>
+          <span className="metric text-[18px]" style={{color:'var(--text-muted)'}}>lb</span>
+        </div>
+      </div>
+      <p className="text-[11px] mono" style={{color:'var(--text-muted)'}}>surface · hairline · shadow-soft · radius lg(14)</p>
+    </div>
+  );
+}
+
+/* ============================== LIST ROWS ============================== */
+function Tag({children, tone='neutral', icon}) {
+  const tones = {
+    neutral: {background:'var(--bg)', color:'var(--text-secondary)', border:'1px solid var(--border)'},
+    soft:    {background:'color-mix(in oklab, var(--text-primary) 6%, var(--surface))', color:'var(--text-secondary)', border:'1px solid var(--border)'},
+  }[tone];
+  return <span className="inline-flex items-center gap-1 px-2 py-[3px] rounded-[6px] text-[11px] font-semibold" style={tones}>{icon}{children}</span>;
+}
+function ListRowsDemo() {
+  return (
+    <div className="space-y-4">
+      <div>
+        <Note>Exercise row</Note>
+        <div className="rounded-[14px] overflow-hidden" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+          {[['Barbell Bench Press','Chest'],['Pull-Up','Back']].map((r,i)=>(
+            <div key={r[0]} className="flex items-center gap-3 px-4 h-[60px]" style={{borderTop:i?'1px solid var(--border)':'none'}}>
+              <div className="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0" style={{background:'var(--bg)', color:'var(--text-secondary)'}}><I.dumbbell s={18}/></div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[14px] font-semibold truncate">{r[0]}</div>
+                <div className="mt-0.5"><Tag tone="soft">{r[1]}</Tag></div>
+              </div>
+              <span style={{color:'var(--text-muted)'}}><I.chevron s={18}/></span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <Note>History / session row</Note>
+        <div className="rounded-[14px] overflow-hidden" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+          {[['Push Day A','May 28','5 exercises · 18 sets','1:02'],['Leg Day','May 26','4 exercises · 15 sets','0:54']].map((r,i)=>(
+            <div key={r[0]} className="flex items-center gap-3 px-4 py-3.5" style={{borderTop:i?'1px solid var(--border)':'none'}}>
+              <div className="flex-1 min-w-0">
+                <div className="text-[14px] font-semibold truncate">{r[0]}</div>
+                <div className="text-[12px] mt-0.5" style={{color:'var(--text-muted)'}}>{r[2]}</div>
+              </div>
+              <div className="text-right">
+                <div className="metric text-[15px] flex items-center gap-1 justify-end"><I.clock s={13}/>{r[3]}</div>
+                <div className="text-[11px] mt-0.5" style={{color:'var(--text-muted)'}}>{r[1]}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================== INPUTS ============================== */
+function TextField() {
+  const [v,setV] = useState('Push Day A');
+  const [foc,setFoc] = useState(false);
+  return (
+    <div>
+      <label className="text-[11px] font-semibold tracking-[0.06em] uppercase block mb-1.5" style={{color:'var(--text-muted)'}}>Template name</label>
+      <input value={v} onChange={e=>setV(e.target.value)} onFocus={()=>setFoc(true)} onBlur={()=>setFoc(false)}
+        className="w-full h-[48px] px-3.5 rounded-[10px] text-[15px] font-medium"
+        style={{background:'var(--bg)', color:'var(--text-primary)',
+          border:'1.5px solid '+(foc?'var(--accent)':'var(--border-strong)'),
+          boxShadow: foc?'0 0 0 4px color-mix(in oklab, var(--accent) 22%, transparent)':'none',
+          transition:'border-color 150ms, box-shadow 150ms'}} />
+    </div>
+  );
+}
+function Stepper({unit='lb', start=185, step=5}) {
+  const [v,setV] = useState(start);
+  const Btn = ({children, on}) => {
+    const [p,setP]=useState(false);
+    return <button onClick={on} onMouseDown={()=>setP(true)} onMouseUp={()=>setP(false)} onMouseLeave={()=>setP(false)}
+      className="w-11 h-11 rounded-[11px] flex items-center justify-center shrink-0"
+      style={{background:'var(--bg)', color:'var(--text-primary)', border:'1px solid var(--border-strong)', transform:p?'scale(0.92)':'scale(1)', transition:'transform 120ms'}}>{children}</button>;
+  };
+  return (
+    <div>
+      <label className="text-[11px] font-semibold tracking-[0.06em] uppercase block mb-1.5" style={{color:'var(--text-muted)'}}>Weight</label>
+      <div className="flex items-center gap-3 rounded-[12px] px-2 h-[60px]" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+        <Btn on={()=>setV(x=>Math.max(0,x-step))}><I.minus s={20}/></Btn>
+        <div className="flex-1 text-center flex items-baseline justify-center gap-1.5">
+          <span className="metric text-[30px]">{v}</span>
+          <span className="metric text-[14px]" style={{color:'var(--text-muted)'}}>{unit}</span>
+        </div>
+        <Btn on={()=>setV(x=>x+step)}><I.plus s={20}/></Btn>
+      </div>
+    </div>
+  );
+}
+function Segmented({opts, init=0}) {
+  const [i,setI] = useState(init);
+  return (
+    <div>
+      <label className="text-[11px] font-semibold tracking-[0.06em] uppercase block mb-1.5" style={{color:'var(--text-muted)'}}>Units</label>
+      <div className="inline-flex rounded-[9px] p-[3px] w-full" style={{background:'var(--bg)', border:'1px solid var(--border)'}}>
+        {opts.map((o,k)=>(
+          <button key={o} onClick={()=>setI(k)} className="flex-1 h-9 rounded-[7px] text-[13px] font-semibold transition-all duration-150"
+            style={i===k?{background:'var(--surface)', color:'var(--text-primary)', boxShadow:'var(--shadow-soft)'}:{color:'var(--text-secondary)'}}>{o}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+function Switch({label, init=true}) {
+  const [on,setOn] = useState(init);
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-[14px] font-medium">{label}</span>
+      <button onClick={()=>setOn(!on)} className="w-[52px] h-[31px] rounded-full relative shrink-0" style={{background:on?'var(--accent)':'var(--border-strong)', transition:'background 200ms'}}>
+        <span className="absolute top-[2px] w-[27px] h-[27px] rounded-full bg-white" style={{left: on?'23px':'2px', transition:'left 220ms cubic-bezier(0.32,0.72,0,1)', boxShadow:'0 1px 3px rgba(0,0,0,0.3)'}} />
+      </button>
+    </div>
+  );
+}
+function RPE() {
+  const [i,setI] = useState(2);
+  const opts = ['Easy','Moderate','Hard','Max'];
+  return (
+    <div>
+      <label className="text-[11px] font-semibold tracking-[0.06em] uppercase block mb-1.5" style={{color:'var(--text-muted)'}}>Effort · RPE</label>
+      <div className="grid grid-cols-4 gap-2">
+        {opts.map((o,k)=>(
+          <button key={o} onClick={()=>setI(k)} className="h-[46px] rounded-[10px] text-[12.5px] font-semibold transition-all duration-150"
+            style={i===k
+              ? {background:'var(--accent)', color:'var(--on-accent)'}
+              : {background:'var(--bg)', color:'var(--text-secondary)', border:'1px solid var(--border)'}}>{o}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+function InputsDemo() {
+  return (
+    <div className="space-y-5">
+      <div><Note>Text field · default & focus</Note><TextField/></div>
+      <div><Note>Number stepper</Note><Stepper/></div>
+      <div><Note>Segmented control</Note><Segmented opts={['lb','kg']}/></div>
+      <div><Note>Toggle / switch</Note>
+        <div className="rounded-[12px] px-4 py-3 space-y-3" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+          <Switch label="Auto-start rest timer" init={true}/>
+          <div style={{height:1, background:'var(--border)'}}/>
+          <Switch label="Haptics on set complete" init={false}/>
+        </div>
+      </div>
+      <div><Note>RPE selector</Note><RPE/></div>
+    </div>
+  );
+}
+
+/* ============================== TAGS & BADGES ============================== */
+function TagsDemo() {
+  return (
+    <div className="space-y-5">
+      <div><Note>Muscle-group tag</Note>
+        <div className="flex flex-wrap gap-2">
+          <Tag tone="soft">Chest</Tag><Tag tone="soft">Back</Tag><Tag tone="soft">Legs</Tag><Tag tone="soft">Shoulders</Tag>
+        </div>
+      </div>
+      <div><Note>Equipment tag</Note>
+        <div className="flex flex-wrap gap-2">
+          <Tag tone="neutral" icon={<I.barbell s={13}/>}>Barbell</Tag>
+          <Tag tone="neutral" icon={<I.dumbbell s={13}/>}>Dumbbell</Tag>
+          <Tag tone="neutral">Bodyweight</Tag>
+        </div>
+      </div>
+      <div><Note>Achievement badge · PB & streak</Note>
+        <div className="flex flex-wrap gap-2.5 items-center">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] font-bold" style={{background:'var(--accent)', color:'var(--on-accent)'}}>
+            <I.award s={14}/> New PB
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] font-semibold" style={{background:'color-mix(in oklab, var(--success) 15%, var(--surface))', color:'var(--success)', border:'1px solid color-mix(in oklab, var(--success) 30%, var(--border))'}}>
+            <I.flame s={14}/> 12 days
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] font-semibold" style={{background:'var(--bg)', color:'var(--text-secondary)', border:'1px solid var(--border)'}}>
+            <I.award s={14}/> 225 lb · 1RM
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================== BOTTOM SHEET HEADER ============================== */
+function SheetDemo() {
+  return (
+    <div className="space-y-2">
+      <Note>Bottom sheet / drawer header</Note>
+      <div className="rounded-t-[22px] pt-2.5" style={{background:'var(--elevated)', border:'1px solid var(--border)', borderBottom:'none', boxShadow:'var(--shadow-sheet)'}}>
+        <div className="w-9 h-[5px] rounded-full mx-auto mb-3" style={{background:'var(--border-strong)'}}/>
+        <div className="flex items-center justify-between px-4 pb-3.5" style={{borderBottom:'1px solid var(--border)'}}>
+          <button className="w-8 h-8 rounded-full flex items-center justify-center" style={{background:'var(--bg)', color:'var(--text-secondary)'}}><I.x s={16}/></button>
+          <div className="text-[15px] font-bold">Log Set</div>
+          <button className="text-[14px] font-semibold" style={{color:'var(--accent)'}}>Done</button>
+        </div>
+        <div className="px-4 py-4">
+          <div className="text-[12px]" style={{color:'var(--text-muted)'}}>Barbell Bench Press · Set 3</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================== TAB BAR ============================== */
+function TabBar() {
+  const [active,setActive] = useState(0);
+  const tabs = [['Home',I.home],['Library',I.layers],['Start',null],['History',I.clock],['Settings',I.sliders]];
+  return (
+    <div className="flex items-stretch px-2 pt-2 pb-5" style={{background:'var(--elevated)', borderTop:'1px solid var(--border)'}}>
+      {tabs.map(([label,Icon],k)=>{
+        if(!Icon){ // center start action
+          return (
+            <div key={label} className="flex-1 flex justify-center">
+              <button className="w-14 h-14 -mt-5 rounded-full flex items-center justify-center" style={{background:'var(--accent)', color:'var(--on-accent)', boxShadow:'var(--shadow-soft)'}}>
+                <I.plus s={26}/>
+              </button>
+            </div>
+          );
+        }
+        const on = active===k;
+        return (
+          <button key={label} onClick={()=>setActive(k)} className="flex-1 flex flex-col items-center gap-1 py-1" style={{color: on?'var(--accent)':'var(--text-muted)'}}>
+            <Icon s={23}/>
+            <span className="text-[10px] font-semibold tracking-[0.02em]">{label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+function TabBarDemo() {
+  return (
+    <div className="space-y-2">
+      <Note>Bottom nav · icon + tiny label, active = accent, center start action</Note>
+      <div className="rounded-[16px] overflow-hidden" style={{border:'1px solid var(--border)'}}>
+        <TabBar/>
+      </div>
+    </div>
+  );
+}
+
+/* ============================== SET LOGGING ROW ============================== */
+function SetRow({n, prev, w, r, state}) {
+  // state: 'done' | 'active' | 'todo'
+  const [done,setDone] = useState(state==='done');
+  const isActive = state==='active' && !done;
+  const fieldStyle = {
+    background: done?'transparent':'var(--bg)',
+    border:'1.5px solid '+(isActive?'var(--accent)':'transparent'),
+    color: done?'var(--text-primary)':'var(--text-primary)',
+  };
+  return (
+    <div className="grid items-center gap-2 px-3 py-2.5" style={{
+      gridTemplateColumns:'26px 1fr 56px 48px 40px',
+      background: done?'color-mix(in oklab, var(--success) 10%, var(--surface))':'var(--surface)',
+      transition:'background 280ms'}}>
+      <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-[12px] font-bold mono"
+        style={{background: done?'var(--success)':'var(--bg)', color: done?'white':'var(--text-secondary)', border: done?'none':'1px solid var(--border)'}}>{n}</div>
+      <div className="metric text-[14px] truncate" style={{color:'var(--text-muted)'}}>{prev}</div>
+      <div className="h-[40px] rounded-[9px] flex items-center justify-center" style={fieldStyle}>
+        <span className="metric text-[19px]">{w}</span>
+      </div>
+      <div className="h-[40px] rounded-[9px] flex items-center justify-center" style={fieldStyle}>
+        <span className="metric text-[19px]" style={{color:isActive?'var(--accent)':'inherit'}}>{r}</span>
+      </div>
+      <button onClick={()=>setDone(!done)} className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center justify-self-end"
+        style={{background: done?'var(--success)':'var(--bg)', color: done?'white':'var(--text-muted)', border: done?'none':'1px solid var(--border-strong)', transition:'all 180ms'}}>
+        <I.check s={18} sw={done?2.6:2}/>
+      </button>
+    </div>
+  );
+}
+function SetLoggingDemo() {
+  return (
+    <div className="space-y-2">
+      <Note>Set logging row · the core interaction</Note>
+      <div className="rounded-[14px] overflow-hidden" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+        {/* header */}
+        <div className="grid gap-2 px-3 py-2 text-[9.5px] font-bold tracking-[0.1em] uppercase" style={{gridTemplateColumns:'26px 1fr 56px 48px 40px', color:'var(--text-muted)', borderBottom:'1px solid var(--border)'}}>
+          <span>Set</span><span>Previous</span><span className="text-center">lb</span><span className="text-center">Reps</span><span/>
+        </div>
+        <Divided>
+          <SetRow n="1" prev="185 × 8" w="185" r="8" state="done"/>
+          <SetRow n="2" prev="185 × 8" w="190" r="6" state="active"/>
+          <SetRow n="3" prev="190 × 6" w="190" r="—" state="todo"/>
+        </Divided>
+      </div>
+      <p className="text-[11px] mono" style={{color:'var(--text-muted)'}}>done → tints success + check fills · active → accent border on the live field</p>
+    </div>
+  );
+}
+function Divided({children}) {
+  const arr = React.Children.toArray(children);
+  return <div>{arr.map((c,i)=><div key={i} style={i?{borderTop:'1px solid var(--border)'}:{}}>{c}</div>)}</div>;
+}
+
+/* ============================== APP ============================== */
+function App() {
+  const [accent,setAccent] = useState('volt');
+  return (
+    <AccentCtx.Provider value={accent}>
+      <header className="sticky top-0 z-30" style={{background:'oklch(0.93 0.006 80 / 0.85)', backdropFilter:'blur(10px)', borderBottom:'1px solid oklch(0.86 0.009 80)'}}>
+        <div className="max-w-[920px] mx-auto px-5 py-3 flex items-center justify-between">
+          <div className="flex items-baseline gap-2.5">
+            <span className="metric text-[19px]" style={{color:'oklch(0.245 0.006 75)'}}>L</span>
+            <span className="text-[14px] font-bold tracking-[0.18em]" style={{color:'oklch(0.245 0.006 75)'}}>LEDGER</span>
+            <span className="hidden sm:inline text-[11px] ml-1" style={{color:'oklch(0.55 0.007 75)'}}>component spec · light + dark</span>
+          </div>
+          <div className="inline-flex rounded-[6px] p-[3px]" style={{background:'oklch(0.98 0.006 80)', border:'1px solid oklch(0.86 0.009 80)'}}>
+            {[['Volt','volt'],['Ember','ember']].map(([l,v])=>(
+              <button key={v} onClick={()=>setAccent(v)} className="px-3 py-1.5 rounded-[4px] text-[12px] font-semibold transition-all"
+                style={accent===v?{background:'oklch(0.245 0.006 75)', color:'oklch(0.96 0.008 85)'}:{color:'oklch(0.45 0.007 75)'}}>{l}</button>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-[920px] mx-auto px-5 pt-10 pb-24">
+        <h1 className="text-[30px] font-bold mb-1" style={{letterSpacing:'-0.03em', color:'oklch(0.245 0.006 75)'}}>Components</h1>
+        <p className="text-[13.5px] mb-12 max-w-[64ch]" style={{color:'oklch(0.5 0.007 75)'}}>
+          Every core component, rendered in both modes on the Ledger tokens. Controls are live — press buttons, drag steppers, toggle switches, complete a set. Designed at phone width (≤390px).
+        </p>
+
+        <Group n="01" title="Buttons" desc="One full-width primary anchored to the bottom; everything else recedes. Press scales to .97 and darkens the accent. Disabled drops to 40%."><Modes><ButtonsDemo/></Modes></Group>
+        <Group n="02" title="Cards" desc="Surface fill, hairline border, the single soft shadow, radius 14. The metric is the loud thing inside."><Modes><CardsDemo/></Modes></Group>
+        <Group n="03" title="List rows" desc="60px tappable rows. Exercise rows carry a muscle tag + chevron; session rows trade the chevron for glanceable stats."><Modes><ListRowsDemo/></Modes></Group>
+        <Group n="04" title="Inputs" desc="Number-first: the stepper and set fields use the hero numeral. Focus shows an accent ring; the RPE row is four equal targets."><Modes><InputsDemo/></Modes></Group>
+        <Group n="05" title="Tags & badges" desc="Tags stay quiet (neutral fills, hairlines). Only achievements borrow color — PB on the accent, streaks on success."><Modes><TagsDemo/></Modes></Group>
+        <Group n="06" title="Bottom sheet header" desc="Grabber, balanced close/title/Done, radius 22 top corners, an upward soft shadow only."><Modes><SheetDemo/></Modes></Group>
+        <Group n="07" title="Tab bar" desc="Icon + tiny label, active in the accent. A center accent action launches a session — the only filled element."><Modes pad={false}><div className="p-5 pt-7"><TabBarDemo/></div></Modes></Group>
+        <Group n="08" title="Set logging row" desc="The heart of the app. Set index, greyed previous performance for reference, weight & reps as big tabular numerals, and a complete-set check that tints the row success."><Modes><SetLoggingDemo/></Modes></Group>
+      </main>
+    </AccentCtx.Provider>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

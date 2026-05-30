@@ -1,10 +1,13 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 import { getSession } from "@/lib/db/sessions";
 import { getMyProfile } from "@/lib/db/profiles";
 import { SessionHeader } from "@/components/session-header";
 import { ReorderableList } from "@/components/reorderable-list";
 import { SessionExerciseCard } from "@/components/session-exercise-card";
 import { AddExerciseSheet } from "@/components/add-exercise-sheet";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
   appendSessionExerciseAction,
@@ -36,7 +39,15 @@ export default async function LiveSessionPage({
   };
 
   return (
-    <div className="space-y-4 pt-2">
+    <div className="space-y-4 pt-1">
+      <Link
+        href="/"
+        className="-ml-1 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ChevronLeft className="size-4" />
+        Today
+      </Link>
+
       <SessionHeader
         sessionId={session.id}
         name={session.name}
@@ -51,7 +62,9 @@ export default async function LiveSessionPage({
       />
 
       {rows.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Add an exercise below to begin.</p>
+        <div className="rounded-lg border border-dashed border-border-strong bg-card px-6 py-8 text-center text-sm text-muted-foreground">
+          Add an exercise below to begin.
+        </div>
       ) : (
         <ReorderableList
           items={rows.map((row) => ({
@@ -82,11 +95,23 @@ export default async function LiveSessionPage({
         defaultEquipment={profile.available_equipment ?? []}
       />
 
-      <form action={deleteAction} className="pt-6">
-        <Button type="submit" variant="destructive" size="sm">
-          Delete session
-        </Button>
-      </form>
+      <div className="flex justify-center pt-4">
+        <ConfirmDialog
+          trigger={
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-faint hover:text-destructive"
+            >
+              Delete session
+            </Button>
+          }
+          title="Delete session?"
+          description="This permanently deletes this session and every set logged in it. This can't be undone."
+          confirmLabel="Delete session"
+          onConfirm={deleteAction}
+        />
+      </div>
     </div>
   );
 }

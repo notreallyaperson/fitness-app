@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,6 +12,7 @@ import { MoreVertical } from "lucide-react";
 import { SetRow } from "@/components/set-row";
 import { SetLogForm } from "@/components/set-log-form";
 import { RestTimer } from "@/components/rest-timer";
+import { ExerciseTimer } from "@/components/exercise-timer";
 import { AddExerciseSheet } from "@/components/add-exercise-sheet";
 import { humaniseEnum } from "@/lib/enums";
 import {
@@ -46,54 +46,80 @@ export function SessionExerciseCard({
 }: Props) {
   const [restStartedAt, setRestStartedAt] = useState<number | null>(null);
 
+  const isTimed =
+    metricKind === "time_only" ||
+    metricKind === "time_weight" ||
+    metricKind === "distance_time";
+  const lastTimed = [...sets]
+    .reverse()
+    .find((s) => s.time_seconds != null)?.time_seconds;
+
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between space-y-0 p-3">
-        <CardTitle className="text-base">{exerciseName}</CardTitle>
-        <div className="flex items-center gap-2">
-          <RestTimer
-            startedAt={restStartedAt}
-            defaultSeconds={defaultRestSeconds}
-            onCancel={() => setRestStartedAt(null)}
-          />
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button variant="ghost" size="icon" aria-label="Exercise menu">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              }
-            />
-            <DropdownMenuContent align="end">
-              <ReplaceMenuItem sessionId={sessionId} rowId={rowId} />
-              <DropdownMenuItem
-                onClick={async () => {
-                  if (sets.length > 0) {
-                    if (
-                      !window.confirm(
-                        `Remove this exercise? ${sets.length} logged set(s) will be discarded.`,
-                      )
-                    ) {
-                      return;
-                    }
-                  }
-                  await removeSessionExerciseAction(sessionId, rowId);
-                }}
-              >
-                Remove
-              </DropdownMenuItem>
-              <DropdownMenuItem render={<a href={`/exercises/${exerciseId}`}>View exercise</a>} />
-            </DropdownMenuContent>
-          </DropdownMenu>
+    <div className="rounded-lg border border-border bg-elevated p-3 shadow-soft">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <h3 className="truncate text-base font-semibold">{exerciseName}</h3>
+          <p className="text-[11px] text-muted-foreground">
+            {humaniseEnum(metricKind)} · {sets.length}{" "}
+            {sets.length === 1 ? "set" : "sets"}
+          </p>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-2 p-3 pt-0">
-        <div className="text-[11px] text-muted-foreground">{humaniseEnum(metricKind)}</div>
-        <div className="space-y-1">
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon"
+                className="-mr-1 shrink-0"
+                aria-label="Exercise menu"
+              >
+                <MoreVertical className="size-4" />
+              </Button>
+            }
+          />
+          <DropdownMenuContent align="end">
+            <ReplaceMenuItem sessionId={sessionId} rowId={rowId} />
+            <DropdownMenuItem
+              onClick={async () => {
+                if (sets.length > 0) {
+                  if (
+                    !window.confirm(
+                      `Remove this exercise? ${sets.length} logged set(s) will be discarded.`,
+                    )
+                  ) {
+                    return;
+                  }
+                }
+                await removeSessionExerciseAction(sessionId, rowId);
+              }}
+            >
+              Remove
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              render={<a href={`/exercises/${exerciseId}`}>View exercise</a>}
+            />
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {sets.length > 0 && (
+        <div className="mt-3 divide-y divide-border rounded-md bg-card px-3 py-1">
           {sets.map((s) => (
             <SetRow key={s.id} sessionId={sessionId} set={s} />
           ))}
         </div>
+      )}
+
+      <div className="mt-3 space-y-2.5">
+        {isTimed && (
+          <ExerciseTimer defaultSeconds={lastTimed ?? 30} />
+        )}
+        <RestTimer
+          startedAt={restStartedAt}
+          defaultSeconds={defaultRestSeconds}
+          onStart={() => setRestStartedAt(Date.now())}
+          onCancel={() => setRestStartedAt(null)}
+        />
         <SetLogForm
           sessionId={sessionId}
           sessionExerciseId={rowId}
@@ -102,12 +128,18 @@ export function SessionExerciseCard({
           defaultDistanceUnit={distanceUnit}
           onLogged={() => setRestStartedAt(Date.now())}
         />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
-function ReplaceMenuItem({ sessionId, rowId }: { sessionId: string; rowId: string }) {
+function ReplaceMenuItem({
+  sessionId,
+  rowId,
+}: {
+  sessionId: string;
+  rowId: string;
+}) {
   return (
     <AddExerciseSheet
       triggerNode={
@@ -125,7 +157,9 @@ function ReplaceMenuItem({ sessionId, rowId }: { sessionId: string; rowId: strin
             `This will discard ${result.setsCount} logged set(s) on the current exercise. Continue?`,
           );
           if (!ok) return;
-          await replaceSessionExerciseAction(sessionId, rowId, newId, { confirm: true });
+          await replaceSessionExerciseAction(sessionId, rowId, newId, {
+            confirm: true,
+          });
         }
       }}
     />

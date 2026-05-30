@@ -4,7 +4,8 @@ import {
   startFromTemplateAction,
   startRepeatLastAction,
 } from "@/server/actions/sessions";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function StartSessionPage({
@@ -16,10 +17,12 @@ export default async function StartSessionPage({
   const templates = await listTemplates();
 
   return (
-    <div className="space-y-6 pt-2">
-      <h1 className="text-2xl font-semibold">Start a session</h1>
+    <div className="space-y-4 pt-1">
+      <h1 className="text-[27px] font-bold tracking-[-0.03em]">
+        Start a session
+      </h1>
       {sp.empty && (
-        <p className="text-sm text-amber-600">
+        <p className="rounded-md bg-warning/15 px-3 py-2 text-sm text-warning">
           No previous session to repeat — pick another option.
         </p>
       )}
@@ -71,6 +74,20 @@ export default async function StartSessionPage({
               Start empty
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Import from JSON</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Link
+            href="/sessions/import"
+            className={buttonVariants({ variant: "outline", className: "w-full" })}
+          >
+            Paste a workout
+          </Link>
         </CardContent>
       </Card>
     </div>

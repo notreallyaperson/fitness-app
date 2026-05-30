@@ -31,7 +31,18 @@ export function ReorderableList({
   onReorder: (idsInOrder: string[]) => Promise<void> | void;
 }) {
   const [order, setOrder] = useState(items);
+  const [prevItems, setPrevItems] = useState(items);
   const [, startTransition] = useTransition();
+
+  // Re-sync with the server when the items prop changes (e.g. a set was
+  // added/removed and the route revalidated). The local order state exists
+  // only to keep drag reordering responsive; the server remains the source
+  // of truth, so without this the list would keep rendering the stale nodes
+  // captured at mount until a full reload.
+  if (items !== prevItems) {
+    setPrevItems(items);
+    setOrder(items);
+  }
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   );
@@ -59,7 +70,7 @@ export function ReorderableList({
         items={order.map((i) => i.id)}
         strategy={verticalListSortingStrategy}
       >
-        <ul className="divide-y rounded-lg border">
+        <ul className="space-y-3">
           {order.map((item) => (
             <Row key={item.id} id={item.id}>
               {item.node}
@@ -72,22 +83,25 @@ export function ReorderableList({
 }
 
 function Row({ id, children }: { id: string; children: ReactNode }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id,
-  });
-  const style = { transform: CSS.Transform.toString(transform), transition };
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : undefined,
+  };
   return (
-    <li ref={setNodeRef} style={style} className="flex items-stretch">
+    <li ref={setNodeRef} style={style} className="flex items-start gap-1.5">
       <button
         type="button"
-        className="flex w-10 cursor-grab items-center justify-center text-muted-foreground"
+        className="mt-3 flex w-6 shrink-0 cursor-grab touch-none items-center justify-center text-faint"
         aria-label="Reorder"
         {...attributes}
         {...listeners}
       >
-        <GripVertical className="h-4 w-4" />
+        <GripVertical className="size-4" />
       </button>
-      <div className="flex-1 p-2">{children}</div>
+      <div className="min-w-0 flex-1">{children}</div>
     </li>
   );
 }

@@ -2,9 +2,11 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Metric } from "@/components/ui/metric";
 import { humaniseEnum } from "@/lib/enums";
 import { formatDuration } from "@/lib/units";
 import {
@@ -50,10 +52,7 @@ export function SessionHeader({
   const paused = isPaused(pauseIntervals);
 
   useEffect(() => {
-    // Only tick while the clock is actually running. When paused the elapsed
-    // value is frozen by the math, and when ended it never changes.
     if (endedAt || paused) return;
-    setNow(Date.now());
     const i = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(i);
   }, [endedAt, paused]);
@@ -83,34 +82,79 @@ export function SessionHeader({
     });
 
   return (
-    <header className="space-y-3 rounded-lg border bg-muted/20 p-3">
-      <div className="flex items-baseline justify-between">
+    <header className="space-y-3 rounded-lg border border-border bg-elevated p-4 shadow-soft">
+      <div className="flex items-start justify-between gap-2">
         <input
           defaultValue={name}
           onBlur={(e) => save({ name: e.currentTarget.value })}
-          className="bg-transparent text-xl font-semibold focus:outline-none"
+          className="min-w-0 flex-1 bg-transparent text-xl font-bold tracking-[-0.02em] focus:outline-none"
         />
-        <span className="flex items-center gap-2 font-mono text-sm">
-          {paused && !endedAt && (
-            <span className="font-sans text-xs font-medium text-amber-600">
-              Paused
-            </span>
-          )}
-          {formatDuration(elapsed)}
-        </span>
+        {!endedAt && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={endSession}
+            className="shrink-0"
+          >
+            End
+          </Button>
+        )}
       </div>
-      <div className="flex flex-wrap items-center gap-3 text-sm">
-        <label className="flex items-center gap-2">
-          <span className="text-muted-foreground">Date</span>
-          <Input
-            type="date"
-            defaultValue={performedOn}
-            onBlur={(e) => save({ performed_on: e.currentTarget.value })}
-            className="h-8"
+
+      {/* Duration block */}
+      <div className="rounded-md bg-muted px-3 py-2.5">
+        <div className="flex items-center gap-2">
+          <span
+            className={cn(
+              "size-2 rounded-full",
+              endedAt
+                ? "bg-faint"
+                : paused
+                  ? "bg-warning"
+                  : "animate-live-dot bg-primary",
+            )}
           />
-        </label>
-        <label className="flex items-center gap-2">
-          <span className="text-muted-foreground">Bodyweight ({weightUnit})</span>
+          <span
+            className={cn(
+              "text-[11px] font-semibold tracking-[0.07em] uppercase",
+              paused ? "text-warning" : "text-muted-foreground",
+            )}
+          >
+            {endedAt ? "Total" : paused ? "Paused" : "Elapsed"}
+          </span>
+          {!endedAt && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={togglePause}
+              className="ml-auto h-7"
+            >
+              {paused ? "Resume" : "Pause"}
+            </Button>
+          )}
+        </div>
+        <Metric
+          mono
+          className={cn(
+            "mt-1 block text-[28px]",
+            paused ? "text-warning" : "text-foreground",
+          )}
+        >
+          {formatDuration(elapsed)}
+        </Metric>
+      </div>
+
+      {/* Meta */}
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <Input
+          type="date"
+          defaultValue={performedOn}
+          onBlur={(e) => save({ performed_on: e.currentTarget.value })}
+          className="h-9 w-auto bg-muted"
+          aria-label="Performed on"
+        />
+        <div className="flex items-center gap-2 rounded-md bg-muted px-3">
+          <span className="text-xs text-muted-foreground">BW</span>
           <Input
             type="number"
             inputMode="decimal"
@@ -120,26 +164,21 @@ export function SessionHeader({
             onBlur={(e) =>
               save({
                 bodyweight:
-                  e.currentTarget.value === "" ? null : Number(e.currentTarget.value),
+                  e.currentTarget.value === ""
+                    ? null
+                    : Number(e.currentTarget.value),
               })
             }
-            className="h-8 w-24"
+            className="h-9 w-16 border-0 bg-transparent px-0"
+            aria-label={`Bodyweight (${weightUnit})`}
           />
-        </label>
-        {!endedAt && (
-          <>
-            <Button size="sm" variant="outline" onClick={togglePause}>
-              {paused ? "Resume" : "Pause"}
-            </Button>
-            <Button size="sm" variant="outline" onClick={endSession}>
-              End session
-            </Button>
-          </>
-        )}
+          <span className="text-xs text-muted-foreground">{weightUnit}</span>
+        </div>
         <span className="ml-auto text-xs text-muted-foreground">
           {format(new Date(performedOn), "EEE")}
         </span>
       </div>
+
       {equipment.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {equipment.map((e) => (
@@ -149,13 +188,19 @@ export function SessionHeader({
           ))}
         </div>
       )}
+
       <Input
         defaultValue={notes ?? ""}
-        placeholder="Session notes (optional)"
+        placeholder="Add session note…"
         onBlur={(e) =>
-          save({ notes: e.currentTarget.value.trim() === "" ? null : e.currentTarget.value })
+          save({
+            notes:
+              e.currentTarget.value.trim() === ""
+                ? null
+                : e.currentTarget.value,
+          })
         }
-        className="h-8 text-xs"
+        className="h-9 bg-muted text-sm"
       />
     </header>
   );

@@ -1,20 +1,34 @@
 import "@/app/globals.css";
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
-import { Header } from "@/components/header";
+import { Inter, JetBrains_Mono } from "next/font/google";
+import { BottomNav } from "@/components/bottom-nav";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { RegisterSW } from "@/components/register-sw";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Exercise Tracker",
+  title: "Ledger — Strength Tracker",
   description: "Log workouts, track effort, get smarter sessions over time.",
   manifest: "/manifest.webmanifest",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b0b0b",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f4ef" },
+    { media: "(prefers-color-scheme: dark)", color: "#1c1b1a" },
+  ],
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -26,14 +40,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.className} min-h-dvh bg-background text-foreground`}
+        className={`${inter.variable} ${jetbrainsMono.variable} min-h-dvh bg-background text-foreground antialiased`}
       >
-        <Header />
-        <RegisterSW />
-        <main className="mx-auto max-w-2xl p-4 pb-24">{children}</main>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <RegisterSW />
+          <main className="mx-auto max-w-2xl p-4 pb-28">{children}</main>
+          <BottomNav />
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

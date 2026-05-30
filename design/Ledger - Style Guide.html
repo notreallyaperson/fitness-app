@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-accent="volt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ledger — Exercise App Style Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  :root, [data-theme="light"] {
+    --bg:            oklch(0.962 0.008 85);
+    --surface:       oklch(0.984 0.007 85);
+    --elevated:      oklch(0.998 0.004 85);
+    --text-primary:  oklch(0.245 0.006 75);
+    --text-secondary:oklch(0.455 0.007 75);
+    --text-muted:    oklch(0.615 0.007 75);
+    --border:        oklch(0.885 0.009 80);
+    --border-strong: oklch(0.80 0.011 80);
+    --accent-volt:   oklch(0.815 0.190 122);
+    --accent-ember:  oklch(0.700 0.150 65);
+    --on-volt:       oklch(0.255 0.040 122);
+    --on-ember:      oklch(0.985 0.010 85);
+    --success:       oklch(0.605 0.140 150);
+    --warning:       oklch(0.780 0.130 85);
+    --destructive:   oklch(0.575 0.185 28);
+    --shadow-inset:  0 1px 1px oklch(0.245 0.02 75 / 0.04);
+    --shadow-soft:   0 2px 10px oklch(0.245 0.04 75 / 0.07), 0 1px 2px oklch(0.245 0.04 75 / 0.05);
+    --shadow-sheet:  0 20px 50px oklch(0.245 0.05 75 / 0.18), 0 6px 16px oklch(0.245 0.05 75 / 0.10);
+  }
+  [data-theme="dark"] {
+    --bg:            oklch(0.178 0.005 80);
+    --surface:       oklch(0.216 0.006 80);
+    --elevated:      oklch(0.258 0.007 80);
+    --text-primary:  oklch(0.952 0.004 85);
+    --text-secondary:oklch(0.722 0.006 82);
+    --text-muted:    oklch(0.560 0.007 82);
+    --border:        oklch(0.305 0.007 82);
+    --border-strong: oklch(0.40 0.009 82);
+    --accent-volt:   oklch(0.855 0.200 122);
+    --accent-ember:  oklch(0.760 0.150 70);
+    --on-volt:       oklch(0.205 0.040 122);
+    --on-ember:      oklch(0.180 0.030 70);
+    --success:       oklch(0.745 0.150 150);
+    --warning:       oklch(0.835 0.130 88);
+    --destructive:   oklch(0.660 0.185 28);
+    --shadow-inset:  0 1px 1px oklch(0 0 0 / 0.30);
+    --shadow-soft:   0 2px 12px oklch(0 0 0 / 0.45), 0 1px 2px oklch(0 0 0 / 0.40);
+    --shadow-sheet:  0 22px 56px oklch(0 0 0 / 0.62), 0 6px 18px oklch(0 0 0 / 0.45);
+  }
+  [data-accent="volt"]  { --accent: var(--accent-volt);  --on-accent: var(--on-volt); }
+  [data-accent="ember"] { --accent: var(--accent-ember); --on-accent: var(--on-ember); }
+
+  * { -webkit-font-smoothing: antialiased; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-variant-numeric: tabular-nums slashed-zero;
+    transition: background 320ms cubic-bezier(0.4,0,0.2,1), color 320ms cubic-bezier(0.4,0,0.2,1);
+  }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .tnum { font-variant-numeric: tabular-nums slashed-zero; }
+  /* the hero numeral treatment used everywhere a metric appears */
+  .metric { font-variant-numeric: tabular-nums slashed-zero; letter-spacing: -0.04em; font-weight: 600; line-height: 0.92; }
+  .hairline { border-color: var(--border); }
+  ::selection { background: var(--accent); color: var(--on-accent); }
+  @keyframes pbpop { 0%{transform:scale(0.4);opacity:0} 60%{transform:scale(1.08)} 100%{transform:scale(1);opacity:1} }
+  @keyframes stamp { 0%{transform:scale(1)} 35%{transform:scale(1.07)} 100%{transform:scale(1)} }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+  @keyframes countdraw { to { stroke-dashoffset: var(--target); } }
+  .reveal { opacity:0; transform: translateY(10px); transition: opacity .6s cubic-bezier(0.4,0,0.2,1), transform .6s cubic-bezier(0.4,0,0.2,1); }
+  .reveal.in { opacity:1; transform:none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ---------- OKLCH → hex (matches what the browser renders) ---------- */
+function oklchToHex(L, C, H) {
+  const h = (H * Math.PI) / 180;
+  const a = C * Math.cos(h), b = C * Math.sin(h);
+  const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+  const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+  const s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+  const l = l_**3, m = m_**3, s = s_**3;
+  let r = 4.0767416621*l - 3.3077115913*m + 0.2309699292*s;
+  let g = -1.2684380046*l + 2.6097574011*m - 0.3413193965*s;
+  let bl = -0.0041960863*l - 0.7034186147*m + 1.7076147010*s;
+  const g2 = (x) => { x = x<=0.0031308 ? 12.92*x : 1.055*Math.pow(x,1/2.4)-0.055; return Math.max(0,Math.min(1,x)); };
+  const to255 = (x) => Math.round(g2(x)*255).toString(16).padStart(2,'0');
+  return ('#'+to255(r)+to255(g)+to255(bl)).toUpperCase();
+}
+const ok = (l,c,h) => `oklch(${l} ${c} ${h})`;
+const okStr = (l,c,h) => `oklch(${l} ${c} ${h})`;
+
+/* ============================ TOKEN DATA ============================ */
+const NEUTRALS = [
+  { label:'Background',     v:'--bg',           usage:'App canvas. Warm off-white — the paper.', light:[0.962,0.008,85], dark:[0.178,0.005,80] },
+  { label:'Surface / Card', v:'--surface',      usage:'Cards, list rows, the working surface.',  light:[0.984,0.007,85], dark:[0.216,0.006,80] },
+  { label:'Elevated',       v:'--elevated',     usage:'Sheets, popovers, the active focal card.',light:[0.998,0.004,85], dark:[0.258,0.007,80] },
+  { label:'Text — primary', v:'--text-primary', usage:'Graphite ink. Headings & metric labels.', light:[0.245,0.006,75], dark:[0.952,0.004,85] },
+  { label:'Text — secondary',v:'--text-secondary',usage:'Supporting copy, secondary labels.',    light:[0.455,0.007,75], dark:[0.722,0.006,82] },
+  { label:'Text — muted',   v:'--text-muted',   usage:'Metadata, units, captions, hints.',       light:[0.615,0.007,75], dark:[0.560,0.007,82] },
+  { label:'Hairline',       v:'--border',       usage:'The primary separator. Does the work of depth.', light:[0.885,0.009,80], dark:[0.305,0.007,82] },
+];
+const ACCENTS = [
+  { key:'volt',  name:'Volt', tag:'Acid lime', v:'--accent-volt',  on:'--on-volt',
+    why:'The only saturated thing on a paper-and-graphite page, so it can only mean “live / now / record.” Yellow-leaning to dodge the fitness neon-green cliché.',
+    light:[0.815,0.190,122], dark:[0.855,0.200,122], onLight:[0.255,0.040,122], onDark:[0.205,0.040,122] },
+  { key:'ember', name:'Ember', tag:'Warm marigold', v:'--accent-ember', on:'--on-ember',
+    why:'Lives inside the paper world rather than fighting it — confident but quiet, for a signal that feels analog rather than electric.',
+    light:[0.700,0.150,65],  dark:[0.760,0.150,70],  onLight:[0.985,0.010,85], onDark:[0.180,0.030,70] },
+];
+const SEMANTIC = [
+  { label:'Success — PB hit', v:'--success',     usage:'Set complete, record beaten.', light:[0.605,0.140,150], dark:[0.745,0.150,150] },
+  { label:'Warning',          v:'--warning',     usage:'Approaching a limit, form caution.', light:[0.780,0.130,85], dark:[0.835,0.130,88] },
+  { label:'Destructive',      v:'--destructive', usage:'Delete a set, end a workout.', light:[0.575,0.185,28], dark:[0.660,0.185,28] },
+];
+const TYPE = [
+  { role:'Display',  size:36, weight:700, lh:1.02, ls:'-0.03em', sample:'Today’s Workout', use:'One per screen. Big moments only.' },
+  { role:'Title',    size:25, weight:700, lh:1.12, ls:'-0.022em', sample:'Upper Body — Push', use:'Section & sheet titles.' },
+  { role:'Headline', size:19, weight:600, lh:1.25, ls:'-0.012em', sample:'Barbell Bench Press', use:'Card headers, exercise names.' },
+  { role:'Body',     size:16, weight:400, lh:1.55, ls:'0',        sample:'Rest 90 seconds, then go again.', use:'Default reading text.' },
+  { role:'Label',    size:12, weight:600, lh:1.1,  ls:'0.07em',   sample:'ADD SET', use:'Buttons & overlines. Uppercase, tracked.', upper:true },
+  { role:'Caption',  size:12, weight:500, lh:1.35, ls:'0.005em',  sample:'Last logged · 2 days ago', use:'Metadata, timestamps, units.' },
+];
+const SPACING = [
+  { n:1, px:4,  use:'Icon ↔ label, hairline gaps. The cluster glue.' },
+  { n:2, px:8,  use:'Inside chips & compact controls.' },
+  { n:3, px:12, use:'Within a tight data cluster (weight × reps).' },
+  { n:4, px:16, use:'List-row padding, default control padding.' },
+  { n:5, px:20, use:'Between stacked controls.' },
+  { n:6, px:24, use:'Comfortable card padding.' },
+  { n:8, px:32, use:'Between cards in a group.' },
+  { n:10,px:40, use:'Between unrelated groups — the air.' },
+  { n:12,px:48, use:'Section separation.' },
+  { n:14,px:56, use:'Screen top padding under the title.' },
+  { n:16,px:64, use:'Major breaks. Let the focal element breathe.' },
+];
+const RADII = [
+  { label:'sm', px:4,   use:'Chips, tags, segmented controls.' },
+  { label:'md', px:8,   use:'Buttons, set rows, inputs.' },
+  { label:'lg', px:14,  use:'Cards & list containers. (Not 12 — deliberate.)' },
+  { label:'xl', px:22,  use:'Bottom sheets, modals, the focal card.' },
+  { label:'full', px:999, use:'Pills, avatars, the rest-timer ring, FAB.' },
+];
+const ELEV = [
+  { label:'Inset', v:'--shadow-inset', use:'Pressed states & embedded fields. Barely there.', big:false },
+  { label:'Soft — the workhorse', v:'--shadow-soft', use:'The single shadow that does almost all the work. Lifts the focal card off the paper.', big:true },
+  { label:'Sheet — overlays only', v:'--shadow-sheet', use:'Reserved for bottom sheets & modals. Used rarely, on purpose.', big:true },
+];
+const MOTION = [
+  { label:'Tap / press', dur:'120ms', ease:'cubic-bezier(0.2, 0, 0, 1)', note:'Buttons, rows, toggles. Scale 0.97 in, settle out.' },
+  { label:'Sheet transition', dur:'360ms', ease:'cubic-bezier(0.32, 0.72, 0, 1)', note:'Bottom sheets & modals. iOS-weighted ease — fast start, soft landing.' },
+  { label:'Timer tick', dur:'1000ms', ease:'linear', note:'Rest countdown. Ring depletes linearly; digits swap with no fade.' },
+  { label:'Metric / PB', dur:'520ms', ease:'cubic-bezier(0.16, 1, 0.3, 1)', note:'Count-up & stamp when a number changes or a record falls.' },
+];
+
+/* ============================ PRIMITIVES ============================ */
+function Mono({children, className=''}) {
+  return <span className={`mono text-[11px] ${className}`}>{children}</span>;
+}
+function ValueChip({l,c,h}) {
+  return (
+    <span className="mono text-[10.5px] leading-tight" style={{color:'var(--text-muted)'}}>
+      {oklchToHex(l,c,h)} · <span style={{opacity:0.85}}>oklch({l} {c} {h})</span>
+    </span>
+  );
+}
+function Seg({options, value, onChange}) {
+  return (
+    <div className="inline-flex rounded-[5px] p-[3px]" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+      {options.map(o => {
+        const active = o.value === value;
+        return (
+          <button key={o.value} onClick={()=>onChange(o.value)}
+            className="px-3 py-[6px] rounded-[4px] text-[12px] font-semibold transition-all duration-150"
+            style={active
+              ? {background:'var(--text-primary)', color:'var(--bg)'}
+              : {color:'var(--text-secondary)', background:'transparent'}}>
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function SectionHead({num, title, kicker}) {
+  return (
+    <div className="flex items-baseline gap-4 mb-8">
+      <span className="metric text-[26px]" style={{color:'var(--accent)'}}>{num}</span>
+      <div>
+        <h2 className="text-[25px] font-bold" style={{letterSpacing:'-0.022em'}}>{title}</h2>
+        <p className="text-[12px] mt-1 font-semibold tracking-[0.07em] uppercase" style={{color:'var(--text-muted)'}}>{kicker}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ============================ COLOR ============================ */
+function ColorRow({label, v, usage, light, dark}) {
+  return (
+    <div className="flex items-center gap-4 py-4" style={{borderBottom:'1px solid var(--border)'}}>
+      <div className="flex gap-1.5 shrink-0">
+        <div className="w-11 h-11 rounded-[8px]" style={{background:ok(...light), boxShadow:'inset 0 0 0 1px var(--border)'}} />
+        <div className="w-11 h-11 rounded-[8px]" style={{background:ok(...dark), boxShadow:'inset 0 0 0 1px var(--border)'}} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline gap-2 flex-wrap">
+          <span className="text-[14px] font-semibold">{label}</span>
+          <Mono className="px-1.5 py-0.5 rounded" style={{}}><span style={{color:'var(--text-muted)'}}>{v}</span></Mono>
+        </div>
+        <p className="text-[12.5px] mt-0.5" style={{color:'var(--text-secondary)'}}>{usage}</p>
+      </div>
+      <div className="hidden md:flex flex-col gap-1.5 shrink-0 text-right">
+        <div><span className="text-[10px] font-semibold tracking-wider mr-2" style={{color:'var(--text-muted)'}}>LIGHT</span><ValueChip l={light[0]} c={light[1]} h={light[2]} /></div>
+        <div><span className="text-[10px] font-semibold tracking-wider mr-2" style={{color:'var(--text-muted)'}}>DARK</span><ValueChip l={dark[0]} c={dark[1]} h={dark[2]} /></div>
+      </div>
+    </div>
+  );
+}
+
+function AccentCard({a, active, onPick}) {
+  return (
+    <div className="rounded-[14px] p-5 transition-all duration-200"
+      style={{background:'var(--surface)', border: active ? '1.5px solid var(--accent)' : '1px solid var(--border)'}}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-[10px]" style={{background:ok(...a.light), boxShadow:'inset 0 0 0 1px oklch(0 0 0 / 0.06)'}} />
+          <div>
+            <div className="text-[15px] font-bold">{a.name}</div>
+            <div className="text-[11.5px]" style={{color:'var(--text-muted)'}}>{a.tag}</div>
+          </div>
+        </div>
+        <button onClick={()=>onPick(a.key)}
+          className="text-[11px] font-semibold px-3 py-1.5 rounded-[6px] transition-all duration-150"
+          style={active
+            ? {background:'var(--accent)', color:'var(--on-accent)'}
+            : {border:'1px solid var(--border-strong)', color:'var(--text-secondary)'}}>
+          {active ? 'In use' : 'Use this'}
+        </button>
+      </div>
+      <p className="text-[12.5px] leading-relaxed mb-4" style={{color:'var(--text-secondary)'}}>{a.why}</p>
+      <div className="flex items-center gap-2 mb-3">
+        <span className="px-3 py-1.5 rounded-full text-[12px] font-semibold" style={{background:ok(...a.light), color:ok(...a.onLight)}}>Start set</span>
+        <span className="metric text-[20px]" style={{color:ok(...a.light)}}>+5</span>
+        <span className="text-[11px] font-semibold" style={{color:'var(--text-muted)'}}>live signal only</span>
+      </div>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 pt-3" style={{borderTop:'1px solid var(--border)'}}>
+        <div><span className="text-[10px] font-semibold tracking-wider mr-1" style={{color:'var(--text-muted)'}}>LIGHT</span><div><ValueChip l={a.light[0]} c={a.light[1]} h={a.light[2]} /></div></div>
+        <div><span className="text-[10px] font-semibold tracking-wider mr-1" style={{color:'var(--text-muted)'}}>DARK</span><div><ValueChip l={a.dark[0]} c={a.dark[1]} h={a.dark[2]} /></div></div>
+      </div>
+    </div>
+  );
+}
+
+function ColorSection({accent, setAccent}) {
+  return (
+    <section className="mb-24">
+      <SectionHead num="01" title="Color" kicker="Warm paper · graphite ink · one signal" />
+      <p className="text-[14px] leading-relaxed mb-7 max-w-[62ch]" style={{color:'var(--text-secondary)'}}>
+        Every swatch shows both modes — left chip light, right chip dark — with hex and OKLCH. The neutrals are warm
+        (hue ≈ 80°), never pure white or pure black, so the surface reads like paper. Color carries meaning: the accent
+        appears only where something is <em>live</em> or a <em>record falls</em>.
+      </p>
+
+      <h3 className="text-[12px] font-semibold tracking-[0.08em] uppercase mb-4" style={{color:'var(--text-muted)'}}>Accent — pick one (drives the whole page)</h3>
+      <div className="grid md:grid-cols-2 gap-4 mb-10">
+        {ACCENTS.map(a => <AccentCard key={a.key} a={a} active={accent===a.key} onPick={setAccent} />)}
+      </div>
+
+      <h3 className="text-[12px] font-semibold tracking-[0.08em] uppercase mb-1" style={{color:'var(--text-muted)'}}>Neutrals</h3>
+      <div className="mb-10">
+        {NEUTRALS.map(n => <ColorRow key={n.v} {...n} />)}
+      </div>
+
+      <h3 className="text-[12px] font-semibold tracking-[0.08em] uppercase mb-1" style={{color:'var(--text-muted)'}}>Semantic</h3>
+      <div>
+        {SEMANTIC.map(n => <ColorRow key={n.v} {...n} />)}
+      </div>
+    </section>
+  );
+}
+
+/* ============================ TYPE ============================ */
+function TypeSection() {
+  return (
+    <section className="mb-24">
+      <SectionHead num="02" title="Type" kicker="Inter · tabular figures everywhere" />
+      <p className="text-[14px] leading-relaxed mb-8 max-w-[62ch]" style={{color:'var(--text-secondary)'}}>
+        One signature idea carries the brand: <strong>oversized tabular numerals are the hero</strong>. The whole app
+        runs <span className="mono text-[12px]">tabular-nums slashed-zero</span> so digits never shift, large text gets
+        tight tracking, and everything that isn’t a number stays quiet.
+      </p>
+
+      {/* HERO METRIC — the one focal element of this section */}
+      <div className="rounded-[22px] p-10 mb-9 flex flex-col items-center text-center" style={{background:'var(--surface)', boxShadow:'var(--shadow-soft)', border:'1px solid var(--border)'}}>
+        <span className="text-[11px] font-semibold tracking-[0.18em] uppercase mb-4" style={{color:'var(--text-muted)'}}>Metric · the hero</span>
+        <div className="flex items-baseline" style={{gap:'14px'}}>
+          <span className="metric" style={{fontSize:'104px', color:'var(--text-primary)'}}>185</span>
+          <span className="metric" style={{fontSize:'40px', color:'var(--text-muted)'}}>lb</span>
+          <span className="metric" style={{fontSize:'68px', color:'var(--accent)'}}>×8</span>
+        </div>
+        <div className="flex gap-6 mt-5 mono text-[11px]" style={{color:'var(--text-muted)'}}>
+          <span>104px</span><span>weight 600</span><span>line-height 0.92</span><span>tracking −0.04em</span><span>tabular · slashed-0</span>
+        </div>
+        <p className="text-[12.5px] mt-4 max-w-[46ch]" style={{color:'var(--text-secondary)'}}>
+          Recommended sizes: <span className="mono">104 / 72 / 48</span> for hero, set rows, and inline stats. Units and
+          multipliers ride alongside at a calmer weight; the accent marks the rep count because reps are the thing you fight for.
+        </p>
+      </div>
+
+      {/* TEXT SCALE */}
+      <div className="rounded-[14px] overflow-hidden" style={{border:'1px solid var(--border)'}}>
+        {TYPE.map((t,i) => (
+          <div key={t.role} className="flex items-center gap-6 px-6 py-5"
+            style={{background:'var(--surface)', borderTop: i ? '1px solid var(--border)' : 'none'}}>
+            <div className="w-24 shrink-0">
+              <div className="text-[12px] font-bold">{t.role}</div>
+              <Mono className="block mt-1"><span style={{color:'var(--text-muted)'}}>{t.size}px</span></Mono>
+            </div>
+            <div className="flex-1 min-w-0 truncate" style={{
+              fontSize: t.size+'px', fontWeight:t.weight, lineHeight:t.lh, letterSpacing:t.ls,
+              textTransform: t.upper ? 'uppercase' : 'none', color:'var(--text-primary)'
+            }}>{t.sample}</div>
+            <div className="hidden lg:block w-[230px] shrink-0 text-right">
+              <Mono><span style={{color:'var(--text-muted)'}}>w{t.weight} · lh {t.lh} · {t.ls}</span></Mono>
+              <p className="text-[11.5px] mt-1" style={{color:'var(--text-secondary)'}}>{t.use}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============================ SPACING ============================ */
+function SpacingSection() {
+  return (
+    <section className="mb-24">
+      <SectionHead num="03" title="Spacing" kicker="4px base · rhythm, not a uniform grid" />
+      <p className="text-[14px] leading-relaxed mb-8 max-w-[62ch]" style={{color:'var(--text-secondary)'}}>
+        The scale is 4px-based, but it’s used with rhythm: small steps (<span className="mono">4–12</span>) glue related
+        data into <strong>tight clusters</strong>; large steps (<span className="mono">40–64</span>) open <strong>generous
+        air</strong> between unrelated groups. Mid steps are rarely used — that gap is the point.
+      </p>
+
+      <div className="grid md:grid-cols-2 gap-10">
+        <div>
+          {SPACING.map(s => (
+            <div key={s.n} className="flex items-center gap-4 py-2.5" style={{borderBottom:'1px solid var(--border)'}}>
+              <Mono className="w-16 shrink-0"><span style={{color:'var(--text-muted)'}}>space-{s.n}</span></Mono>
+              <span className="metric text-[13px] w-10 shrink-0" style={{color:'var(--text-primary)'}}>{s.px}</span>
+              <div className="h-3 rounded-[2px] shrink-0" style={{width:s.px+'px', background:'var(--accent)'}} />
+              <p className="text-[11.5px] leading-snug" style={{color:'var(--text-secondary)'}}>{s.use}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* rhythm demonstration */}
+        <div className="rounded-[14px] p-6 self-start" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+          <span className="text-[11px] font-semibold tracking-[0.14em] uppercase" style={{color:'var(--text-muted)'}}>Rhythm in practice</span>
+          {/* cluster 1 */}
+          <div style={{marginTop:'40px'}}>
+            <div className="flex items-baseline" style={{gap:'12px'}}>
+              <span className="metric text-[44px]">185</span>
+              <span className="metric text-[20px]" style={{color:'var(--text-muted)'}}>lb</span>
+              <span className="metric text-[30px]" style={{color:'var(--accent)'}}>×8</span>
+            </div>
+            <div className="text-[12px] font-semibold mt-1" style={{color:'var(--text-secondary)'}}>Set 1 · Bench Press</div>
+          </div>
+          {/* big air */}
+          <div style={{marginTop:'40px'}}>
+            <div className="flex items-baseline" style={{gap:'12px'}}>
+              <span className="metric text-[44px]">190</span>
+              <span className="metric text-[20px]" style={{color:'var(--text-muted)'}}>lb</span>
+              <span className="metric text-[30px]" style={{color:'var(--accent)'}}>×6</span>
+            </div>
+            <div className="text-[12px] font-semibold mt-1" style={{color:'var(--text-secondary)'}}>Set 2 · Bench Press</div>
+          </div>
+          <div className="flex gap-6 mt-8 pt-4 mono text-[10.5px]" style={{borderTop:'1px solid var(--border)', color:'var(--text-muted)'}}>
+            <span>cluster gap = 12</span><span>group gap = 40</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============================ RADIUS ============================ */
+function RadiusSection() {
+  return (
+    <section className="mb-24">
+      <SectionHead num="04" title="Radius" kicker="Deliberate values — 14 & 22, not 12 & 24" />
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        {RADII.map(r => (
+          <div key={r.label} className="rounded-[14px] p-5 flex flex-col" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+            <div className="h-20 mb-4" style={{
+              background:'var(--bg)', border:'1.5px solid var(--accent)',
+              borderRadius: (r.px>900?'999px':r.px+'px')
+            }} />
+            <div className="flex items-baseline gap-2">
+              <span className="text-[13px] font-bold">{r.label}</span>
+              <span className="metric text-[12px]" style={{color:'var(--text-muted)'}}>{r.px>900?'full':r.px+'px'}</span>
+            </div>
+            <p className="text-[11.5px] mt-1 leading-snug" style={{color:'var(--text-secondary)'}}>{r.use}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============================ ELEVATION ============================ */
+function ElevationSection() {
+  return (
+    <section className="mb-24">
+      <SectionHead num="05" title="Elevation" kicker="Hairlines + one soft shadow" />
+      <p className="text-[14px] leading-relaxed mb-8 max-w-[62ch]" style={{color:'var(--text-secondary)'}}>
+        Depth is mostly a hairline and air. There is exactly one shadow that does real work — <strong>Soft</strong> — tinted
+        warm rather than black. Inset is a whisper for pressed states; Sheet is reserved for overlays and used sparingly. No glows, no stacks.
+      </p>
+      <div className="grid md:grid-cols-3 gap-6">
+        {ELEV.map(e => (
+          <div key={e.label}>
+            <div className="h-32 rounded-[14px] flex items-center justify-center mb-3"
+              style={{background:'var(--elevated)', boxShadow:`var(${e.v})`, border:'1px solid var(--border)'}}>
+              <span className="metric text-[28px]" style={{color:'var(--text-muted)'}}>0{ELEV.indexOf(e)+1}</span>
+            </div>
+            <div className="text-[13px] font-bold mb-1">{e.label}</div>
+            <Mono className="block mb-1"><span style={{color:'var(--text-muted)'}}>{e.v}</span></Mono>
+            <p className="text-[11.5px] leading-snug" style={{color:'var(--text-secondary)'}}>{e.use}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============================ MOTION + SIGNATURES ============================ */
+function TapDemo() {
+  const [p,setP] = useState(false);
+  return (
+    <button
+      onMouseDown={()=>setP(true)} onMouseUp={()=>setP(false)} onMouseLeave={()=>setP(false)}
+      onTouchStart={()=>setP(true)} onTouchEnd={()=>setP(false)}
+      className="px-6 py-3 rounded-[8px] text-[14px] font-semibold w-full"
+      style={{background:'var(--accent)', color:'var(--on-accent)',
+        transform: p?'scale(0.97)':'scale(1)',
+        transition:'transform 120ms cubic-bezier(0.2,0,0,1)'}}>
+      Press me · 120ms
+    </button>
+  );
+}
+
+function SheetDemo() {
+  const [open,setOpen] = useState(false);
+  return (
+    <div className="relative rounded-[14px] overflow-hidden" style={{height:'180px', background:'var(--bg)', border:'1px solid var(--border)'}}>
+      <button onClick={()=>setOpen(true)} className="absolute top-3 left-1/2 -translate-x-1/2 text-[12px] font-semibold px-3 py-1.5 rounded-[6px]" style={{border:'1px solid var(--border-strong)', color:'var(--text-secondary)'}}>Open sheet</button>
+      <div className="absolute inset-x-2 bottom-2 rounded-[18px] p-5"
+        style={{background:'var(--elevated)', boxShadow:'var(--shadow-sheet)', border:'1px solid var(--border)',
+          transform: open?'translateY(0)':'translateY(120%)',
+          transition:'transform 360ms cubic-bezier(0.32,0.72,0,1)'}}>
+        <div className="w-10 h-1 rounded-full mx-auto mb-3" style={{background:'var(--border-strong)'}} />
+        <div className="text-[14px] font-bold mb-1">Log a set</div>
+        <p className="text-[12px] mb-3" style={{color:'var(--text-secondary)'}}>Slides on a 360ms iOS-weighted ease.</p>
+        <button onClick={()=>setOpen(false)} className="text-[12px] font-semibold px-3 py-1.5 rounded-[6px]" style={{background:'var(--accent)', color:'var(--on-accent)'}}>Done</button>
+      </div>
+    </div>
+  );
+}
+
+function TimerDemo() {
+  const [t,setT] = useState(90);
+  const [run,setRun] = useState(false);
+  const R = 34, C = 2*Math.PI*R;
+  useEffect(()=>{
+    if(!run) return;
+    const id = setInterval(()=> setT(v => { if(v<=1){ clearInterval(id); setRun(false); return 0; } return v-1; }), 1000);
+    return ()=>clearInterval(id);
+  },[run]);
+  const mm = String(Math.floor(t/60)).padStart(1,'0');
+  const ss = String(t%60).padStart(2,'0');
+  const low = t<=3 && t>0;
+  const frac = t/90;
+  return (
+    <div className="flex items-center gap-5">
+      <div className="relative" style={{width:'92px', height:'92px'}}>
+        <svg width="92" height="92" style={{transform:'rotate(-90deg)'}}>
+          <circle cx="46" cy="46" r={R} fill="none" stroke="var(--border)" strokeWidth="6" />
+          <circle cx="46" cy="46" r={R} fill="none" stroke={low?'var(--destructive)':'var(--accent)'} strokeWidth="6"
+            strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C*(1-frac)}
+            style={{transition:'stroke-dashoffset 1000ms linear, stroke 200ms'}} />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center metric text-[22px]"
+          style={{color: low?'var(--destructive)':'var(--text-primary)', animation: low?'blink 1s steps(2) infinite':'none'}}>
+          {mm}:{ss}
+        </div>
+      </div>
+      <div>
+        <button onClick={()=>{ if(t===0) setT(90); setRun(r=>!r); }}
+          className="text-[12px] font-semibold px-3 py-1.5 rounded-[6px] mb-2 block"
+          style={{background:'var(--accent)', color:'var(--on-accent)'}}>{run?'Pause':'Start rest'}</button>
+        <button onClick={()=>{setRun(false);setT(90);}} className="text-[11px] font-semibold" style={{color:'var(--text-muted)'}}>Reset</button>
+        <p className="text-[11px] mt-2 max-w-[16ch]" style={{color:'var(--text-secondary)'}}>Final 3s: colon blinks, ring turns destructive.</p>
+      </div>
+    </div>
+  );
+}
+
+function PBDemo() {
+  const [val,setVal] = useState(180);
+  const [pb,setPb] = useState(false);
+  const [stamp,setStamp] = useState(0);
+  const rafRef = useRef();
+  const beat = useCallback(()=>{
+    const from = 180, to = 185, dur = 520, start = performance.now();
+    setPb(false);
+    const step = (now)=>{
+      const k = Math.min(1,(now-start)/dur);
+      const e = 1-Math.pow(1-k,3);
+      setVal(Math.round(from+(to-from)*e));
+      if(k<1) rafRef.current = requestAnimationFrame(step);
+      else { setVal(to); setPb(true); setStamp(s=>s+1); }
+    };
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(step);
+  },[]);
+  useEffect(()=>()=>cancelAnimationFrame(rafRef.current),[]);
+  return (
+    <div className="flex items-center gap-5">
+      <div className="relative">
+        <div className="flex items-baseline" style={{gap:'10px'}}>
+          <span key={stamp} className="metric text-[52px]" style={{color: pb?'var(--accent)':'var(--text-primary)', animation: pb?'stamp 520ms cubic-bezier(0.16,1,0.3,1)':'none'}}>{val}</span>
+          <span className="metric text-[22px]" style={{color:'var(--text-muted)'}}>lb</span>
+        </div>
+        {pb && (
+          <span className="absolute -top-3 -right-2 text-[10px] font-bold px-2 py-0.5 rounded-full"
+            style={{background:'var(--accent)', color:'var(--on-accent)', animation:'pbpop 420ms cubic-bezier(0.16,1,0.3,1)'}}>NEW PB</span>
+        )}
+      </div>
+      <div>
+        <button onClick={beat} className="text-[12px] font-semibold px-3 py-1.5 rounded-[6px] block mb-2" style={{background:'var(--text-primary)', color:'var(--bg)'}}>Beat your PB</button>
+        <p className="text-[11px] max-w-[18ch]" style={{color:'var(--text-secondary)'}}>Count-up + stamp, the accent flashes, a quiet tag snaps in.</p>
+      </div>
+    </div>
+  );
+}
+
+function SetCompleteDemo() {
+  const [done,setDone] = useState(false);
+  return (
+    <div className="rounded-[10px] px-4 py-3 flex items-center gap-4"
+      style={{background: done?'color-mix(in oklab, var(--success) 12%, var(--surface))':'var(--surface)',
+        border:'1px solid '+(done?'color-mix(in oklab, var(--success) 35%, var(--border))':'var(--border)'),
+        transition:'background 300ms, border-color 300ms'}}>
+      <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+        style={{background: done?'var(--success)':'transparent', border: done?'none':'1.5px solid var(--border-strong)', transition:'all 200ms'}}>
+        {done && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>}
+      </div>
+      <div className="flex items-baseline flex-1" style={{gap:'10px'}}>
+        <span className="metric text-[34px]" style={{color: done?'var(--text-primary)':'var(--text-secondary)', animation: done?'stamp 420ms cubic-bezier(0.16,1,0.3,1)':'none'}}>185</span>
+        <span className="metric text-[16px]" style={{color:'var(--text-muted)'}}>lb</span>
+        <span className="metric text-[22px]" style={{color: done?'var(--success)':'var(--text-muted)'}}>×8</span>
+      </div>
+      <button onClick={()=>setDone(d=>!d)} className="text-[12px] font-semibold px-3 py-1.5 rounded-[6px]"
+        style={done?{border:'1px solid var(--border-strong)', color:'var(--text-secondary)'}:{background:'var(--accent)', color:'var(--on-accent)'}}>
+        {done?'Undo':'Log set'}
+      </button>
+    </div>
+  );
+}
+
+function MotionSection() {
+  return (
+    <section className="mb-24">
+      <SectionHead num="06" title="Motion" kicker="Durations · easing · live demos" />
+      <div className="rounded-[14px] overflow-hidden mb-9" style={{border:'1px solid var(--border)'}}>
+        {MOTION.map((m,i)=>(
+          <div key={m.label} className="flex items-center gap-5 px-6 py-4" style={{background:'var(--surface)', borderTop:i?'1px solid var(--border)':'none'}}>
+            <span className="text-[13px] font-semibold w-36 shrink-0">{m.label}</span>
+            <span className="metric text-[15px] w-20 shrink-0" style={{color:'var(--accent)'}}>{m.dur}</span>
+            <Mono className="hidden md:block w-[230px] shrink-0"><span style={{color:'var(--text-muted)'}}>{m.ease}</span></Mono>
+            <p className="text-[12px]" style={{color:'var(--text-secondary)'}}>{m.note}</p>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="text-[12px] font-semibold tracking-[0.08em] uppercase mb-4" style={{color:'var(--text-muted)'}}>Signature details — try them</h3>
+      <div className="grid md:grid-cols-2 gap-5">
+        <div className="rounded-[14px] p-5" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+          <div className="text-[13px] font-bold mb-1">① Set completes</div>
+          <p className="text-[12px] mb-4" style={{color:'var(--text-secondary)'}}>The number stamps (1.07→1), a hairline check draws, the row tints success-low.</p>
+          <SetCompleteDemo />
+        </div>
+        <div className="rounded-[14px] p-5" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+          <div className="text-[13px] font-bold mb-1">② New personal best</div>
+          <p className="text-[12px] mb-4" style={{color:'var(--text-secondary)'}}>The metric count-ups to the new figure and turns accent; a quiet PB tag snaps in.</p>
+          <PBDemo />
+        </div>
+        <div className="rounded-[14px] p-5" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+          <div className="text-[13px] font-bold mb-1">③ Rest timer</div>
+          <p className="text-[12px] mb-4" style={{color:'var(--text-secondary)'}}>Oversized MM:SS, ring depletes linearly; the last three seconds read in destructive.</p>
+          <TimerDemo />
+        </div>
+        <div className="rounded-[14px] p-5 flex flex-col" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+          <div className="text-[13px] font-bold mb-1">Tap & sheet</div>
+          <p className="text-[12px] mb-4" style={{color:'var(--text-secondary)'}}>Press scale and the bottom-sheet ease.</p>
+          <div className="mt-auto space-y-3">
+            <TapDemo />
+            <SheetDemo />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============================ APP ============================ */
+function App() {
+  const [theme,setTheme] = useState('light');
+  const [accent,setAccent] = useState('volt');
+  useEffect(()=>{ document.documentElement.dataset.theme = theme; },[theme]);
+  useEffect(()=>{ document.documentElement.dataset.accent = accent; },[accent]);
+  useEffect(()=>{
+    const els = Array.from(document.querySelectorAll('.reveal'));
+    // Failsafe: never let content visibility depend on the observer.
+    const revealInView = ()=> els.forEach(el=>{ if(el.getBoundingClientRect().top < window.innerHeight*0.95) el.classList.add('in'); });
+    let obs;
+    if('IntersectionObserver' in window){
+      obs = new IntersectionObserver((es)=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); }), {threshold:0.06});
+      els.forEach(el=>obs.observe(el));
+    }
+    revealInView();                                   // reveal anything already on screen
+    requestAnimationFrame(revealInView);
+    const t = setTimeout(()=> els.forEach(el=>el.classList.add('in')), 500); // hard fallback
+    return ()=>{ if(obs) obs.disconnect(); clearTimeout(t); };
+  },[]);
+
+  return (
+    <div>
+      {/* sticky header */}
+      <header className="sticky top-0 z-20" style={{background:'color-mix(in oklab, var(--bg) 86%, transparent)', backdropFilter:'blur(10px)', borderBottom:'1px solid var(--border)'}}>
+        <div className="max-w-[1040px] mx-auto px-6 md:px-10 py-3.5 flex items-center justify-between">
+          <div className="flex items-baseline gap-2.5">
+            <span className="metric text-[20px]">L</span>
+            <span className="text-[15px] font-bold tracking-[0.18em]">LEDGER</span>
+            <span className="hidden sm:inline text-[11px] font-medium ml-1" style={{color:'var(--text-muted)'}}>exercise app · design foundations</span>
+          </div>
+          <div className="flex items-center gap-2.5">
+            <Seg options={[{label:'Volt',value:'volt'},{label:'Ember',value:'ember'}]} value={accent} onChange={setAccent} />
+            <Seg options={[{label:'Light',value:'light'},{label:'Dark',value:'dark'}]} value={theme} onChange={setTheme} />
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-[1040px] mx-auto px-6 md:px-10">
+        {/* MASTHEAD + rationale */}
+        <div className="pt-16 pb-12 reveal">
+          <div className="flex items-baseline flex-wrap" style={{gap:'16px'}}>
+            <h1 className="text-[44px] md:text-[60px] font-bold leading-[0.98]" style={{letterSpacing:'-0.035em'}}>The number is<br/>the interface.</h1>
+          </div>
+          <div className="mt-9 grid md:grid-cols-[1.6fr_1fr] gap-8 items-start">
+            <p className="text-[15px] leading-relaxed" style={{color:'var(--text-secondary)'}}>
+              <strong style={{color:'var(--text-primary)'}}>Ledger</strong> treats a strength workout as what it actually is — a number you’re trying to beat — so the
+              number <em>is</em> the interface. Oversized tabular numerals carry every screen while labels, chrome, and controls recede into
+              graphite on warm paper, the palette of a training logbook rather than a dashboard. There are no gradients, no glows, and exactly
+              one soft shadow; depth comes from hairlines and air. A single acid accent appears only where something is live or a record falls,
+              so color always means something. Calm enough to read mid-set, confident enough to make a new PB feel earned.
+            </p>
+            <div className="rounded-[14px] p-5" style={{background:'var(--surface)', border:'1px solid var(--border)'}}>
+              <span className="text-[10.5px] font-semibold tracking-[0.14em] uppercase" style={{color:'var(--text-muted)'}}>Principles</span>
+              <ul className="mt-3 space-y-2 text-[12.5px]" style={{color:'var(--text-secondary)'}}>
+                <li className="flex gap-2"><span style={{color:'var(--accent)'}}>—</span> One focal element per screen.</li>
+                <li className="flex gap-2"><span style={{color:'var(--accent)'}}>—</span> Numbers loud, everything else quiet.</li>
+                <li className="flex gap-2"><span style={{color:'var(--accent)'}}>—</span> Tight clusters, generous air.</li>
+                <li className="flex gap-2"><span style={{color:'var(--accent)'}}>—</span> Color = meaning, never decoration.</li>
+                <li className="flex gap-2"><span style={{color:'var(--accent)'}}>—</span> Depth from hairlines, not shadows.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="reveal"><ColorSection accent={accent} setAccent={setAccent} /></div>
+        <div className="reveal"><TypeSection /></div>
+        <div className="reveal"><SpacingSection /></div>
+        <div className="reveal"><RadiusSection /></div>
+        <div className="reveal"><ElevationSection /></div>
+        <div className="reveal"><MotionSection /></div>
+
+        <footer className="py-12 flex items-center justify-between" style={{borderTop:'1px solid var(--border)'}}>
+          <span className="text-[12px]" style={{color:'var(--text-muted)'}}>Ledger — exercise app design foundations</span>
+          <span className="metric text-[12px]" style={{color:'var(--text-muted)'}}>v1 · {accent} · {theme}</span>
+        </footer>
+      </main>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

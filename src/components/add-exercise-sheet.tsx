@@ -49,26 +49,36 @@ export function AddExerciseSheet({
           {triggerLabel}
         </SheetTrigger>
       )}
-      <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto">
-        <SheetTitle>Add exercise</SheetTitle>
+      <SheetContent
+        side="bottom"
+        className="max-h-[85dvh] overflow-y-auto rounded-t-xl bg-elevated"
+      >
+        <div className="mx-auto mb-1 h-1.5 w-10 rounded-full bg-border" />
+        <SheetTitle className="text-lg font-bold tracking-[-0.02em]">
+          Add exercise
+        </SheetTitle>
         <div className="space-y-3 pt-3">
           <Input
             autoFocus
             value={q}
             onChange={(e) => refresh(e.target.value)}
             placeholder="Search…"
+            className="h-11 bg-muted"
           />
-          <ul className="divide-y rounded-lg border">
+          <ul className="divide-y divide-border">
             {results.map((ex) => (
-              <li key={ex.id} className="flex items-center justify-between p-3">
-                <div>
-                  <div className="font-medium">{ex.name}</div>
+              <li
+                key={ex.id}
+                className="flex items-center justify-between gap-3 py-3"
+              >
+                <div className="min-w-0">
+                  <div className="truncate font-medium">{ex.name}</div>
                   <div className="text-xs text-muted-foreground">
                     {ex.primary_muscle ? humaniseEnum(ex.primary_muscle) : "—"}
                   </div>
                   <div className="mt-1 flex flex-wrap gap-1">
                     {(ex.equipment ?? []).slice(0, 4).map((eq) => (
-                      <Badge key={eq} variant="outline" className="text-[10px]">
+                      <Badge key={eq} variant="secondary" className="text-[10px]">
                         {humaniseEnum(eq)}
                       </Badge>
                     ))}
@@ -76,6 +86,7 @@ export function AddExerciseSheet({
                 </div>
                 <Button
                   size="sm"
+                  className="shrink-0"
                   onClick={async () => {
                     await onPick(ex.id);
                     setOpen(false);
@@ -86,7 +97,7 @@ export function AddExerciseSheet({
               </li>
             ))}
             {q && results.length === 0 && (
-              <li className="p-4 text-sm text-muted-foreground">No matches.</li>
+              <li className="py-4 text-sm text-muted-foreground">No matches.</li>
             )}
           </ul>
         </div>

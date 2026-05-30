@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ledger — Developer Handoff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:oklch(0.962 0.008 85); --surface:oklch(0.984 0.007 85); --inset:oklch(0.945 0.008 82);
+    --ink:oklch(0.245 0.006 75); --sec:oklch(0.455 0.007 75); --muted:oklch(0.615 0.007 75); --faint:oklch(0.74 0.007 80);
+    --border:oklch(0.885 0.009 80); --strong:oklch(0.80 0.011 80);
+    --volt:oklch(0.815 0.190 122); --on-volt:oklch(0.255 0.040 122);
+    --code-bg:oklch(0.205 0.006 80); --code-fg:oklch(0.90 0.005 85); --code-dim:oklch(0.62 0.01 82); --code-key:oklch(0.855 0.20 122);
+    --success:oklch(0.605 0.140 150);
+  }
+  *{box-sizing:border-box; -webkit-font-smoothing:antialiased;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Inter',system-ui,sans-serif; font-variant-numeric:tabular-nums slashed-zero; line-height:1.55; }
+  .wrap{ max-width:820px; margin:0 auto; padding:0 28px 120px; }
+  .mono{ font-family:'JetBrains Mono',ui-monospace,monospace; }
+  .metric{ font-variant-numeric:tabular-nums slashed-zero; letter-spacing:-0.04em; font-weight:600; }
+  header.top{ position:sticky; top:0; z-index:5; background:color-mix(in oklab, var(--bg) 86%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); }
+  header.top .row{ max-width:820px; margin:0 auto; padding:14px 28px; display:flex; align-items:baseline; gap:10px; }
+  h1.title{ font-size:38px; letter-spacing:-0.035em; font-weight:700; margin:54px 0 10px; line-height:1.02; }
+  .lede{ font-size:15px; color:var(--sec); max-width:64ch; margin-bottom:8px; }
+  h2{ font-size:22px; letter-spacing:-0.02em; font-weight:700; margin:64px 0 6px; display:flex; align-items:baseline; gap:12px; }
+  h2 .n{ font-size:15px; color:var(--volt); }
+  h3{ font-size:14px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:30px 0 12px; }
+  .sub{ font-size:13px; color:var(--sec); margin:0 0 18px; max-width:66ch; }
+  /* code block */
+  .code{ position:relative; background:var(--code-bg); border-radius:14px; margin:14px 0; overflow:hidden; box-shadow:0 2px 10px oklch(0.245 0.04 75 / 0.08); }
+  .code .bar{ display:flex; align-items:center; justify-content:space-between; padding:9px 14px; border-bottom:1px solid oklch(0.30 0.006 82); }
+  .code .fname{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--code-dim); letter-spacing:0.02em; }
+  .code button{ font-family:'Inter',sans-serif; font-size:11.5px; font-weight:600; color:var(--code-fg); background:oklch(0.30 0.007 82); border:none; padding:5px 11px; border-radius:7px; cursor:pointer; transition:background .15s; }
+  .code button:hover{ background:oklch(0.36 0.008 122); }
+  .code button.ok{ background:var(--volt); color:var(--on-volt); }
+  pre{ margin:0; padding:16px 18px; overflow-x:auto; }
+  pre code{ font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.7; color:var(--code-fg); white-space:pre; }
+  pre code .c{ color:var(--code-dim); }   /* comment */
+  pre code .k{ color:var(--code-key); }    /* key/selector */
+  pre code .v{ color:oklch(0.80 0.09 220); } /* value */
+  /* table */
+  table{ width:100%; border-collapse:collapse; font-size:12.5px; margin:6px 0 8px; }
+  th{ text-align:left; font-size:10.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--faint); padding:8px 10px; border-bottom:1px solid var(--strong); }
+  td{ padding:9px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  td.tok{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink); white-space:nowrap; font-weight:500; }
+  td.val{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--sec); white-space:nowrap; }
+  td.use{ color:var(--sec); }
+  .sw{ display:inline-block; width:13px; height:13px; border-radius:4px; margin-right:6px; vertical-align:-2px; box-shadow:inset 0 0 0 1px oklch(0 0 0 /0.12); }
+  /* map cards */
+  .map{ border:1px solid var(--border); border-radius:14px; background:var(--surface); padding:16px 18px; margin:12px 0; }
+  .map .h{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .map .led{ font-size:15px; font-weight:700; letter-spacing:-0.01em; }
+  .map .arrow{ color:var(--faint); }
+  .map .sh{ font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; color:var(--volt); background:color-mix(in oklab, var(--volt) 14%, var(--surface)); padding:2px 8px; border-radius:6px; }
+  .map p{ font-size:13px; color:var(--sec); margin:6px 0 0; }
+  .map code{ font-family:'JetBrains Mono',monospace; font-size:11.5px; background:var(--inset); padding:1px 5px; border-radius:5px; color:var(--ink); }
+  .callout{ border-left:3px solid var(--volt); background:color-mix(in oklab, var(--volt) 8%, var(--bg)); padding:12px 16px; border-radius:0 10px 10px 0; font-size:13px; color:var(--sec); margin:16px 0; }
+  .callout b{ color:var(--ink); }
+  a{ color:var(--volt); }
+</style>
+</head>
+<body>
+<header class="top"><div class="row">
+  <span class="metric" style="font-size:18px">L</span>
+  <span style="font-size:13px; font-weight:700; letter-spacing:0.18em">LEDGER</span>
+  <span style="font-size:12px; color:var(--muted); margin-left:2px">Developer Handoff</span>
+</div></header>
+
+<div class="wrap">
+  <h1 class="title">Ledger — Handoff</h1>
+  <p class="lede">Design tokens and component mapping for a Next.js + Tailwind v4 + shadcn/ui codebase. Warm-paper neutrals, graphite ink, one acid accent (<b>Volt</b>) used only for live/record states. Numbers are the hero — every metric uses tabular, slashed-zero figures.</p>
+
+  <!-- ============ 1 ============ -->
+  <h2><span class="n">01</span> Tailwind v4 <span class="mono" style="font-size:18px">@theme</span></h2>
+  <p class="sub">Drop into <code class="mono">app/globals.css</code>. Variables are declared on <code class="mono">:root</code> / <code class="mono">.dark</code> and exposed to utilities via <code class="mono">@theme inline</code> (so <code class="mono">bg-card</code>, <code class="mono">text-muted-foreground</code>, etc. follow the active mode). Names are shadcn-native; Ledger-specific extras (<code class="mono">elevated</code>, <code class="mono">success</code>, <code class="mono">border-strong</code>, the metric utility) are additive.</p>
+
+  <div class="callout"><b>Mapping gotcha:</b> the brand color <b>Volt</b> maps to shadcn <code class="mono">--primary</code>, <i>not</i> <code class="mono">--accent</code>. In shadcn, <code class="mono">--accent</code> is the subtle hover/selected surface — here it points at the muted inset. Don't paint buttons with it.</div>
+
+  <div class="code">
+    <div class="bar"><span class="fname">app/globals.css</span><button data-copy="css1">Copy</button></div>
+<pre><code id="css1"><span class="c">/* Ledger — Tailwind v4 design tokens */</span>
+<span class="k">@import</span> <span class="v">"tailwindcss"</span>;
+
+<span class="c">/* dark mode via .dark class on &lt;html&gt; */</span>
+<span class="k">@custom-variant</span> dark (&:where(.dark, .dark *));
+
+<span class="k">:root</span> {
+  <span class="c">/* — surfaces — */</span>
+  --background:            <span class="v">oklch(0.962 0.008 85)</span>;
+  --card:                  <span class="v">oklch(0.984 0.007 85)</span>;
+  --elevated:              <span class="v">oklch(0.998 0.004 85)</span>;
+  --popover:               <span class="v">oklch(0.998 0.004 85)</span>;
+  --muted:                 <span class="v">oklch(0.945 0.008 82)</span>;
+  --secondary:             <span class="v">oklch(0.984 0.007 85)</span>;
+  --accent:                <span class="v">oklch(0.945 0.008 82)</span>;  <span class="c">/* hover surface */</span>
+  <span class="c">/* — text — */</span>
+  --foreground:            <span class="v">oklch(0.245 0.006 75)</span>;
+  --card-foreground:       <span class="v">oklch(0.245 0.006 75)</span>;
+  --popover-foreground:    <span class="v">oklch(0.245 0.006 75)</span>;
+  --secondary-foreground:  <span class="v">oklch(0.455 0.007 75)</span>;
+  --accent-foreground:     <span class="v">oklch(0.245 0.006 75)</span>;
+  --muted-foreground:      <span class="v">oklch(0.615 0.007 75)</span>;
+  --faint:                 <span class="v">oklch(0.740 0.007 80)</span>;  <span class="c">/* prev/hints */</span>
+  <span class="c">/* — brand (Volt) — */</span>
+  --primary:               <span class="v">oklch(0.815 0.190 122)</span>;
+  --primary-foreground:    <span class="v">oklch(0.255 0.040 122)</span>;
+  --ring:                  <span class="v">oklch(0.815 0.190 122)</span>;
+  <span class="c">/* — lines — */</span>
+  --border:                <span class="v">oklch(0.885 0.009 80)</span>;
+  --border-strong:         <span class="v">oklch(0.800 0.011 80)</span>;
+  --input:                 <span class="v">oklch(0.800 0.011 80)</span>;
+  <span class="c">/* — semantic — */</span>
+  --success:               <span class="v">oklch(0.605 0.140 150)</span>;
+  --warning:               <span class="v">oklch(0.760 0.150 70)</span>;
+  --destructive:           <span class="v">oklch(0.575 0.185 28)</span>;
+  --destructive-foreground:<span class="v">oklch(0.985 0.010 28)</span>;
+  --radius:                <span class="v">0.875rem</span>;            <span class="c">/* 14px = card */</span>
+}
+
+<span class="k">.dark</span> {
+  --background:            <span class="v">oklch(0.178 0.005 80)</span>;
+  --card:                  <span class="v">oklch(0.216 0.006 80)</span>;
+  --elevated:              <span class="v">oklch(0.258 0.007 80)</span>;
+  --popover:               <span class="v">oklch(0.258 0.007 80)</span>;
+  --muted:                 <span class="v">oklch(0.150 0.005 80)</span>;
+  --secondary:             <span class="v">oklch(0.216 0.006 80)</span>;
+  --accent:                <span class="v">oklch(0.258 0.007 80)</span>;
+  --foreground:            <span class="v">oklch(0.952 0.004 85)</span>;
+  --card-foreground:       <span class="v">oklch(0.952 0.004 85)</span>;
+  --popover-foreground:    <span class="v">oklch(0.952 0.004 85)</span>;
+  --secondary-foreground:  <span class="v">oklch(0.722 0.006 82)</span>;
+  --accent-foreground:     <span class="v">oklch(0.952 0.004 85)</span>;
+  --muted-foreground:      <span class="v">oklch(0.560 0.007 82)</span>;
+  --faint:                 <span class="v">oklch(0.440 0.008 82)</span>;
+  --primary:               <span class="v">oklch(0.855 0.200 122)</span>;
+  --primary-foreground:    <span class="v">oklch(0.205 0.040 122)</span>;
+  --ring:                  <span class="v">oklch(0.855 0.200 122)</span>;
+  --border:                <span class="v">oklch(0.305 0.007 82)</span>;
+  --border-strong:         <span class="v">oklch(0.400 0.009 82)</span>;
+  --input:                 <span class="v">oklch(0.400 0.009 82)</span>;
+  --success:               <span class="v">oklch(0.745 0.150 150)</span>;
+  --warning:               <span class="v">oklch(0.820 0.140 75)</span>;
+  --destructive:           <span class="v">oklch(0.660 0.185 28)</span>;
+  --destructive-foreground:<span class="v">oklch(0.150 0.020 28)</span>;
+}
+
+<span class="k">@theme inline</span> {
+  <span class="c">/* colors → utilities (bg-*, text-*, border-*) */</span>
+  --color-background:            <span class="v">var(--background)</span>;
+  --color-foreground:            <span class="v">var(--foreground)</span>;
+  --color-card:                  <span class="v">var(--card)</span>;
+  --color-card-foreground:       <span class="v">var(--card-foreground)</span>;
+  --color-elevated:              <span class="v">var(--elevated)</span>;
+  --color-popover:               <span class="v">var(--popover)</span>;
+  --color-popover-foreground:    <span class="v">var(--popover-foreground)</span>;
+  --color-primary:               <span class="v">var(--primary)</span>;
+  --color-primary-foreground:    <span class="v">var(--primary-foreground)</span>;
+  --color-secondary:             <span class="v">var(--secondary)</span>;
+  --color-secondary-foreground:  <span class="v">var(--secondary-foreground)</span>;
+  --color-muted:                 <span class="v">var(--muted)</span>;
+  --color-muted-foreground:      <span class="v">var(--muted-foreground)</span>;
+  --color-accent:                <span class="v">var(--accent)</span>;
+  --color-accent-foreground:     <span class="v">var(--accent-foreground)</span>;
+  --color-faint:                 <span class="v">var(--faint)</span>;
+  --color-success:               <span class="v">var(--success)</span>;
+  --color-warning:               <span class="v">var(--warning)</span>;
+  --color-destructive:           <span class="v">var(--destructive)</span>;
+  --color-destructive-foreground:<span class="v">var(--destructive-foreground)</span>;
+  --color-border:                <span class="v">var(--border)</span>;
+  --color-border-strong:         <span class="v">var(--border-strong)</span>;
+  --color-input:                 <span class="v">var(--input)</span>;
+  --color-ring:                  <span class="v">var(--ring)</span>;
+
+  <span class="c">/* radius scale */</span>
+  --radius-sm:  <span class="v">4px</span>;   --radius-md:  <span class="v">8px</span>;
+  --radius-lg:  <span class="v">14px</span>;  --radius-xl:  <span class="v">22px</span>;
+
+  <span class="c">/* type */</span>
+  --font-sans: <span class="v">'Inter', ui-sans-serif, system-ui, sans-serif</span>;
+  --font-mono: <span class="v">'JetBrains Mono', ui-monospace, monospace</span>;
+
+  <span class="c">/* one soft shadow + the CTA shadow (warm-tinted) */</span>
+  --shadow-soft: <span class="v">0 2px 10px oklch(0.245 0.04 75 / .07), 0 1px 2px oklch(0.245 0.04 75 / .05)</span>;
+  --shadow-cta:  <span class="v">0 6px 22px oklch(0.245 0.04 75 / .10)</span>;
+
+  <span class="c">/* motion */</span>
+  --ease-tap:   <span class="v">cubic-bezier(0.2, 0, 0, 1)</span>;
+  --ease-sheet: <span class="v">cubic-bezier(0.32, 0.72, 0, 1)</span>;
+}
+
+<span class="c">/* tabular figures everywhere + the metric hero utility */</span>
+<span class="k">@layer base</span> { body { font-feature-settings: <span class="v">"tnum" 1, "zero" 1</span>; } }
+<span class="k">@utility metric</span> {
+  font-variant-numeric: <span class="v">tabular-nums slashed-zero</span>;
+  letter-spacing: <span class="v">-0.04em</span>; font-weight: <span class="v">600</span>; line-height: <span class="v">0.92</span>;
+}</code></pre>
+  </div>
+  <p class="sub" style="margin-top:14px">Dark-mode shadows: shadows are nearly invisible on the dark surface by design — depth there comes from <code class="mono">border</code> + <code class="mono">elevated</code>. If you want them, override <code class="mono">--shadow-soft</code> inside <code class="mono">.dark</code> with a black-based rgba. Toggle the theme by adding/removing <code class="mono">.dark</code> on <code class="mono">&lt;html&gt;</code> (e.g. <code class="mono">next-themes</code>).</p>
+
+  <!-- ============ 2 ============ -->
+  <h2><span class="n">02</span> Tokens</h2>
+  <p class="sub">Light / dark values and where each is used. All color is OKLCH (<span class="mono">L C H</span>).</p>
+
+  <h3>Surfaces &amp; lines</h3>
+  <table>
+    <thead><tr><th>Token</th><th>Light</th><th>Dark</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.962 0.008 85)"></span>background</td><td class="val">.962 .008 85</td><td class="val">.178 .005 80</td><td class="use">App canvas — warm paper, never pure white.</td></tr>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.984 0.007 85)"></span>card</td><td class="val">.984 .007 85</td><td class="val">.216 .006 80</td><td class="use">Cards, list rows, working surface.</td></tr>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.998 0.004 85)"></span>elevated</td><td class="val">.998 .004 85</td><td class="val">.258 .007 80</td><td class="use">Sheets, popovers, focal/active card.</td></tr>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.945 0.008 82)"></span>muted / accent</td><td class="val">.945 .008 82</td><td class="val">.150 / .258</td><td class="use">Inset fields, chips, hover surface.</td></tr>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.885 0.009 80)"></span>border</td><td class="val">.885 .009 80</td><td class="val">.305 .007 82</td><td class="use">Hairlines — the primary separator.</td></tr>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.80 0.011 80)"></span>border-strong / input</td><td class="val">.800 .011 80</td><td class="val">.400 .009 82</td><td class="use">Input/stepper borders, secondary btn.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Text</h3>
+  <table>
+    <thead><tr><th>Token</th><th>Light</th><th>Dark</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.245 0.006 75)"></span>foreground</td><td class="val">.245 .006 75</td><td class="val">.952 .004 85</td><td class="use">Graphite ink — headings, metrics.</td></tr>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.455 0.007 75)"></span>secondary-foreground</td><td class="val">.455 .007 75</td><td class="val">.722 .006 82</td><td class="use">Body & supporting copy.</td></tr>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.615 0.007 75)"></span>muted-foreground</td><td class="val">.615 .007 75</td><td class="val">.560 .007 82</td><td class="use">Labels, captions, units.</td></tr>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.74 0.007 80)"></span>faint</td><td class="val">.740 .007 80</td><td class="val">.440 .008 82</td><td class="use">“prev” targets, disabled hints, grips.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Brand &amp; semantic</h3>
+  <table>
+    <thead><tr><th>Token</th><th>Light</th><th>Dark</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.815 0.190 122)"></span>primary <span style="color:var(--faint);font-weight:400">(Volt)</span></td><td class="val">.815 .190 122</td><td class="val">.855 .200 122</td><td class="use">Live/active/record only — CTA, ring, live timer, PB.</td></tr>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.255 0.04 122)"></span>primary-foreground</td><td class="val">.255 .040 122</td><td class="val">.205 .040 122</td><td class="use">Ink on Volt (Volt is light — never white text).</td></tr>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.605 0.14 150)"></span>success</td><td class="val">.605 .140 150</td><td class="val">.745 .150 150</td><td class="use">Set complete, PB hit, streaks.</td></tr>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.76 0.15 70)"></span>warning</td><td class="val">.760 .150 70</td><td class="val">.820 .140 75</td><td class="use">Paused timer, caution.</td></tr>
+      <tr><td class="tok"><span class="sw" style="background:oklch(0.575 0.185 28)"></span>destructive</td><td class="val">.575 .185 28</td><td class="val">.660 .185 28</td><td class="use">End session, delete set.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Radius · shadow · type · motion</h3>
+  <table>
+    <thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td class="tok">radius-sm / md</td><td class="val">4px / 8px</td><td class="use">Chips & tags / buttons, inputs, set rows.</td></tr>
+      <tr><td class="tok">radius-lg / xl</td><td class="val">14px / 22px</td><td class="use">Cards & lists / sheets & modals.</td></tr>
+      <tr><td class="tok">shadow-soft</td><td class="val">0 2px 10px …/.07</td><td class="use">The one workhorse shadow (light only).</td></tr>
+      <tr><td class="tok">shadow-cta</td><td class="val">0 6px 22px …/.10</td><td class="use">Primary CTA & FAB lift.</td></tr>
+      <tr><td class="tok">font-sans / mono</td><td class="val">Inter / JetBrains Mono</td><td class="use">UI / countdown & code.</td></tr>
+      <tr><td class="tok">.metric</td><td class="val">tnum, -0.04em, 600</td><td class="use">All weights, reps, timers — the hero numeral.</td></tr>
+      <tr><td class="tok">ease-tap / sheet</td><td class="val">120ms / 360ms</td><td class="use">Press scale .97 / bottom-sheet slide.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ 3 ============ -->
+  <h2><span class="n">03</span> shadcn/ui mapping</h2>
+  <p class="sub">Each Ledger component maps to a stock shadcn primitive with these overrides. After <code class="mono">npx shadcn@latest init</code> (base color: Neutral), replace the generated tokens with §01.</p>
+
+  <div class="map">
+    <div class="h"><span class="led">Buttons</span><span class="arrow">→</span><span class="sh">Button</span></div>
+    <p><b>Primary CTA</b> = <code>variant="default"</code> → <code>bg-primary text-primary-foreground</code>, full-width <code>h-[52px] rounded-lg shadow-cta</code>. <b>Secondary</b> = <code>variant="outline"</code> → <code>bg-card border-border-strong</code>. <b>Ghost</b> & <b>Destructive</b> map 1:1. <b>Icon button</b> = <code>size="icon"</code> at <code>44×44 rounded-md</code>. Add globally: <code>active:scale-[0.97] transition-transform duration-[120ms] ease-[--ease-tap]</code>. Override the default radius (shadcn ships <code>rounded-md</code>; our buttons are <code>md=8px</code>, the bottom CTA is <code>lg=14px</code>).</p>
+  </div>
+
+  <div class="map">
+    <div class="h"><span class="led">Card</span><span class="arrow">→</span><span class="sh">Card</span></div>
+    <p>Default → <code>bg-card border border-border rounded-lg shadow-soft</code>. The focal/active card (in-progress, sheets) swaps to <code>bg-elevated</code>. Drop shadcn's heavier default shadow; depth is one soft level + hairlines only.</p>
+  </div>
+
+  <div class="map">
+    <div class="h"><span class="led">Inputs · Stepper · Switch</span><span class="arrow">→</span><span class="sh">Input</span> <span class="sh">Switch</span></div>
+    <p><b>Text field</b> = <code>Input</code> → <code>bg-muted border-input rounded-md h-12 focus-visible:ring-2 ring-ring</code>. <b>Number stepper</b> (weight/reps) is <i>composed</i>, not stock: two <code>Button size="icon"</code> flanking a <code>.metric</code> value. <b>Switch</b> → checked state <code>bg-primary</code>. <b>RPE selector</b> = <code>ToggleGroup type="single"</code> (deselectable → tap-again clears), selected item <code>bg-primary text-primary-foreground</code>.</p>
+  </div>
+
+  <div class="map">
+    <div class="h"><span class="led">Bottom sheet</span><span class="arrow">→</span><span class="sh">Drawer</span></div>
+    <p>shadcn <code>Drawer</code> (vaul) for Add-exercise & Log-set. Style <code>DrawerContent</code> → <code>bg-elevated rounded-t-xl</code> (22px) with the grabber handle; balanced <code>close · title · Done</code> header. Slide uses <code>--ease-sheet</code>. Use <code>Dialog</code> only for confirm-destructive ("End session?").</p>
+  </div>
+
+  <div class="map">
+    <div class="h"><span class="led">Segmented · Tabs</span><span class="arrow">→</span><span class="sh">Tabs</span></div>
+    <p>In-page segmented controls (units lb/kg) = <code>Tabs</code> with a pill <code>TabsList bg-muted</code> and <code>TabsTrigger</code> active → <code>bg-card shadow-soft</code>. <b>Note:</b> the <b>bottom nav is NOT shadcn Tabs</b> — it's a custom fixed bar (icon + 10px label, active <code>text-primary</code>, center <code>bg-primary</code> action). Build it by hand.</p>
+  </div>
+
+  <div class="map">
+    <div class="h"><span class="led">Tags &amp; badges</span><span class="arrow">→</span><span class="sh">Badge</span></div>
+    <p>Muscle/equipment tags = <code>variant="secondary"</code> → <code>bg-muted text-secondary-foreground rounded-sm</code>. <b>PB</b> = <code>variant="default"</code> → <code>bg-primary text-primary-foreground</code>. <b>Streak</b> = add a <code>success</code> variant → <code>bg-success/15 text-success</code>. Keep tags monochrome; only achievements take color.</p>
+  </div>
+
+  <div class="callout" style="margin-top:24px"><b>Not in shadcn — build custom:</b> the set-logging row, the rest timer (idle/running/done), the live duration timer, and the oversized metric numerals. All lean on the <code class="mono">.metric</code> utility + <code class="mono">font-mono</code> for countdowns. These are the brand; don't substitute a generic component.</p>
+</div>
+
+<script>
+  document.querySelectorAll('.code button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const el=document.getElementById(b.dataset.copy);
+      navigator.clipboard.writeText(el.innerText).then(()=>{
+        const t=b.textContent; b.textContent='Copied'; b.classList.add('ok');
+        setTimeout(()=>{ b.textContent=t; b.classList.remove('ok'); },1400);
+      });
+    });
+  });
+</script>
+</body>
+</html>

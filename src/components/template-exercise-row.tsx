@@ -1,8 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 import { humaniseEnum } from "@/lib/enums";
 import {
   updateTemplateExerciseAction,
@@ -54,86 +53,71 @@ export function TemplateExerciseRow({
   const showDistance =
     metricKind === "distance_only" || metricKind === "distance_time";
 
+  const cells: {
+    label: string;
+    value: number | null;
+    commit: (v: number | null) => void;
+    step?: string;
+  }[] = [
+    { label: "Sets", value: defaults.target_sets, commit: (v) => save({ target_sets: v }) },
+  ];
+  if (showReps)
+    cells.push({ label: "Reps", value: defaults.target_reps, commit: (v) => save({ target_reps: v }) });
+  if (showWeight)
+    cells.push({ label: "Weight", value: defaults.target_weight, commit: (v) => save({ target_weight: v }), step: "0.5" });
+  if (showTime)
+    cells.push({ label: "Time s", value: defaults.target_time_seconds, commit: (v) => save({ target_time_seconds: v }) });
+  if (showDistance)
+    cells.push({ label: "Dist", value: defaults.target_distance, commit: (v) => save({ target_distance: v }), step: "0.1" });
+  cells.push({ label: "Rest s", value: defaults.rest_seconds, commit: (v) => save({ rest_seconds: v }) });
+
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="font-medium">{exerciseName}</div>
+    <div className="space-y-2.5 rounded-lg border border-border bg-elevated p-3 shadow-soft">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h3 className="truncate text-base font-semibold">{exerciseName}</h3>
+          <p className="text-[11px] text-muted-foreground">
+            {humaniseEnum(metricKind)}
+          </p>
+        </div>
         <form action={removeTemplateExerciseAction.bind(null, templateId, rowId)}>
-          <Button type="submit" size="sm" variant="ghost">
-            Remove
-          </Button>
+          <button
+            type="submit"
+            aria-label="Remove exercise"
+            className="flex size-7 items-center justify-center rounded-md text-faint transition-colors hover:bg-muted hover:text-destructive"
+          >
+            <X className="size-4" />
+          </button>
         </form>
       </div>
-      <div className="grid grid-cols-3 gap-2 text-sm">
-        <Field
-          label="Sets"
-          defaultValue={defaults.target_sets}
-          onCommit={(v) => save({ target_sets: v })}
-        />
-        {showReps && (
-          <Field
-            label="Reps"
-            defaultValue={defaults.target_reps}
-            onCommit={(v) => save({ target_reps: v })}
-          />
-        )}
-        {showWeight && (
-          <Field
-            label="Weight"
-            defaultValue={defaults.target_weight}
-            onCommit={(v) => save({ target_weight: v })}
-            step="0.5"
-          />
-        )}
-        {showTime && (
-          <Field
-            label="Time (s)"
-            defaultValue={defaults.target_time_seconds}
-            onCommit={(v) => save({ target_time_seconds: v })}
-          />
-        )}
-        {showDistance && (
-          <Field
-            label="Distance"
-            defaultValue={defaults.target_distance}
-            onCommit={(v) => save({ target_distance: v })}
-            step="0.1"
-          />
-        )}
-        <Field
-          label="Rest (s)"
-          defaultValue={defaults.rest_seconds}
-          onCommit={(v) => save({ rest_seconds: v })}
-        />
-      </div>
-      <div className="text-[11px] text-muted-foreground">{humaniseEnum(metricKind)}</div>
-    </div>
-  );
-}
 
-function Field({
-  label,
-  defaultValue,
-  onCommit,
-  step,
-}: {
-  label: string;
-  defaultValue: number | null;
-  onCommit: (v: number | null) => void;
-  step?: string;
-}) {
-  return (
-    <label className="flex flex-col gap-1">
-      <span className="text-[11px] text-muted-foreground">{label}</span>
-      <Input
-        type="number"
-        inputMode="decimal"
-        step={step ?? "1"}
-        defaultValue={defaultValue ?? ""}
-        onBlur={(e) =>
-          onCommit(e.currentTarget.value === "" ? null : Number(e.currentTarget.value))
-        }
-      />
-    </label>
+      <div className="grid grid-cols-3 gap-px overflow-hidden rounded-md bg-border">
+        {cells.map((cell) => (
+          <label
+            key={cell.label}
+            className="flex flex-col gap-0.5 bg-muted px-2.5 py-1.5"
+          >
+            <span className="text-[9.5px] tracking-wide text-faint uppercase">
+              {cell.label}
+            </span>
+            <input
+              type="number"
+              inputMode="decimal"
+              step={cell.step ?? "1"}
+              defaultValue={cell.value ?? ""}
+              placeholder="—"
+              onBlur={(e) =>
+                cell.commit(
+                  e.currentTarget.value === ""
+                    ? null
+                    : Number(e.currentTarget.value),
+                )
+              }
+              className="metric w-full bg-transparent text-[17px] text-foreground outline-none placeholder:text-faint [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </label>
+        ))}
+      </div>
+    </div>
   );
 }

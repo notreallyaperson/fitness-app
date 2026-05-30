@@ -1,16 +1,23 @@
 import { getMyProfile } from "@/lib/db/profiles";
 import { saveProfile } from "@/server/actions/profiles";
+import { signOut } from "@/server/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EquipmentMultiselect } from "@/components/equipment-multiselect";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function SettingsPage() {
   const profile = await getMyProfile();
 
   return (
-    <div className="space-y-6 pt-2">
-      <h1 className="text-2xl font-semibold">Settings</h1>
+    <div className="space-y-6 pt-1">
+      <h1 className="text-[27px] font-bold tracking-[-0.03em]">Settings</h1>
+
+      <section className="space-y-2">
+        <p className="text-sm font-medium">Appearance</p>
+        <ThemeToggle />
+      </section>
       <form action={saveProfile} className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="display_name">Display name</Label>
@@ -81,7 +88,19 @@ export default async function SettingsPage() {
           />
         </div>
 
-        <Button type="submit">Save</Button>
+        <Button type="submit" className="h-12 w-full rounded-lg shadow-cta">
+          Save
+        </Button>
+      </form>
+
+      <form action={signOut} className="border-t border-border pt-6">
+        <Button
+          type="submit"
+          variant="outline"
+          className="h-11 w-full text-destructive"
+        >
+          Sign out
+        </Button>
       </form>
     </div>
   );
