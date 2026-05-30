@@ -1,0 +1,672 @@
+[
+  {
+    "name": "Monday 30 March - Gym + Ball Work",
+    "notes": "Logged session. Moderate gym session plus approximately 30 minutes football drills and 8 minutes sauna.",
+    "exercises": [
+      {
+        "name": "Single Leg RDL",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 12.5, "weight_unit": "kg", "reps": 10 },
+          { "weight": 12.5, "weight_unit": "kg", "reps": 10 },
+          { "weight": 12.5, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "Glute Bridge",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 0, "weight_unit": "kg", "reps": 12, "is_warmup": true },
+          { "weight": 5, "weight_unit": "kg", "reps": 12 },
+          { "weight": 5, "weight_unit": "kg", "reps": 12 }
+        ]
+      },
+      {
+        "name": "Lat Pulldown",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 32, "weight_unit": "kg", "reps": 10 },
+          { "weight": 36, "weight_unit": "kg", "reps": 10 },
+          { "weight": 41, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "Incline Dumbbell Press",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 17.5, "weight_unit": "kg", "reps": 10 },
+          { "weight": 20, "weight_unit": "kg", "reps": 10 },
+          { "weight": 20, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "Football Practice",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 1800 }]
+      },
+      {
+        "name": "Sauna",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 480 }]
+      }
+    ]
+  },
+  {
+    "name": "Wednesday 1 April - Upper Body + Core",
+    "notes": "Logged upper-focused gym session.",
+    "exercises": [
+      {
+        "name": "Pull-up",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 10 }, { "reps": 5 }, { "reps": 4 }]
+      },
+      {
+        "name": "Dumbbell Shoulder Press",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 10, "weight_unit": "kg", "reps": 10 },
+          { "weight": 10, "weight_unit": "kg", "reps": 10 },
+          { "weight": 10, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "Single Arm Cable Row",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 14, "weight_unit": "kg", "reps": 10 },
+          { "weight": 14, "weight_unit": "kg", "reps": 10 },
+          { "weight": 14, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "Deficit Push-Ups",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 10 }, { "reps": 8 }, { "reps": 8 }]
+      },
+      {
+        "name": "Dumbbell Bicep Curl",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 12.5, "weight_unit": "kg", "reps": 10 },
+          { "weight": 10, "weight_unit": "kg", "reps": 10 },
+          { "weight": 10, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "DB Skullcrusher",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 7.5, "weight_unit": "kg", "reps": 10 },
+          { "weight": 7.5, "weight_unit": "kg", "reps": 10 },
+          { "weight": 7.5, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "Lateral Raise",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 7.5, "weight_unit": "kg", "reps": 10 },
+          { "weight": 7.5, "weight_unit": "kg", "reps": 10 },
+          { "weight": 7.5, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "V-Sits",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 10 }, { "reps": 10 }, { "reps": 10 }]
+      },
+      {
+        "name": "Side Plank",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 60 }, { "time_seconds": 60 }]
+      }
+    ]
+  },
+  {
+    "name": "Sunday 4 May - Athletic Full Body",
+    "notes": "Logged football-focused athletic session. Exact weights not fully visible, so conservative tracked working weights are used from known exercise history.",
+    "exercises": [
+      {
+        "name": "Pogo Jumps",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 15 }, { "reps": 15 }]
+      },
+      {
+        "name": "Lateral Bounds",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 5 }, { "reps": 5 }]
+      },
+      {
+        "name": "Single Leg RDL",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 15, "weight_unit": "kg", "reps": 8 },
+          { "weight": 15, "weight_unit": "kg", "reps": 8 },
+          { "weight": 15, "weight_unit": "kg", "reps": 8 }
+        ]
+      },
+      {
+        "name": "Single Leg Glute Bridge",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 10 }, { "reps": 10 }, { "reps": 10 }]
+      },
+      {
+        "name": "Plank DB Pull Through",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 10, "weight_unit": "kg", "reps": 10 },
+          { "weight": 10, "weight_unit": "kg", "reps": 10 },
+          { "weight": 10, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "Farmers Carry",
+        "metric_kind": "time_weight",
+        "sets": [
+          { "weight": 22.5, "weight_unit": "kg", "time_seconds": 30 },
+          { "weight": 22.5, "weight_unit": "kg", "time_seconds": 30 },
+          { "weight": 22.5, "weight_unit": "kg", "time_seconds": 30 }
+        ]
+      },
+      {
+        "name": "Chin-up",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 8 }, { "reps": 6 }, { "reps": 5 }]
+      },
+      {
+        "name": "Dumbbell Preacher Curl",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 10, "weight_unit": "kg", "reps": 10 },
+          { "weight": 10, "weight_unit": "kg", "reps": 10 },
+          { "weight": 10, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "DB Skullcrusher",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 7.5, "weight_unit": "kg", "reps": 10 },
+          { "weight": 7.5, "weight_unit": "kg", "reps": 10 },
+          { "weight": 7.5, "weight_unit": "kg", "reps": 10 }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Saturday - Recovery Swim",
+    "notes": "Post-match recovery swim after shin knock. Easy recovery effort only.",
+    "exercises": [
+      {
+        "name": "Pool Walking",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 300, "is_warmup": true }]
+      },
+      {
+        "name": "Swimming",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 900 }]
+      },
+      {
+        "name": "Pool Walking",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 300 }]
+      }
+    ]
+  },
+  {
+    "name": "Saturday - Upper Body Optional",
+    "notes": "Recovery-day upper body session after Friday match. Lower body intentionally unloaded.",
+    "exercises": [
+      {
+        "name": "Chin-up",
+        "metric_kind": "bodyweight_reps",
+        "sets": [
+          { "reps": 5, "is_warmup": true },
+          { "reps": 8, "rpe": 7 },
+          { "reps": 6, "rpe": 8 },
+          { "reps": 5, "rpe": 8 }
+        ]
+      },
+      {
+        "name": "Dumbbell Bench Press",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 15, "weight_unit": "kg", "reps": 10, "is_warmup": true },
+          { "weight": 20, "weight_unit": "kg", "reps": 8, "rpe": 7 },
+          { "weight": 20, "weight_unit": "kg", "reps": 8, "rpe": 8 },
+          { "weight": 20, "weight_unit": "kg", "reps": 8, "rpe": 8 }
+        ]
+      },
+      {
+        "name": "Half Kneeling Single Arm Press",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 12.5, "weight_unit": "kg", "reps": 8, "rpe": 7 },
+          { "weight": 12.5, "weight_unit": "kg", "reps": 8, "rpe": 7 },
+          { "weight": 12.5, "weight_unit": "kg", "reps": 8, "rpe": 8 }
+        ]
+      },
+      {
+        "name": "Single Arm Cable Row",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 30, "weight_unit": "kg", "reps": 10, "rpe": 7 },
+          { "weight": 35, "weight_unit": "kg", "reps": 10, "rpe": 8 },
+          { "weight": 35, "weight_unit": "kg", "reps": 10, "rpe": 8 }
+        ]
+      },
+      {
+        "name": "Single Arm Farmer Carry",
+        "metric_kind": "time_weight",
+        "sets": [
+          { "weight": 22.5, "weight_unit": "kg", "time_seconds": 30 },
+          { "weight": 22.5, "weight_unit": "kg", "time_seconds": 30 },
+          { "weight": 22.5, "weight_unit": "kg", "time_seconds": 30 }
+        ]
+      },
+      {
+        "name": "Bear Plank Shoulder Taps",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 20 }, { "reps": 20 }, { "reps": 20 }]
+      },
+      {
+        "name": "Sauna",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 600 }]
+      }
+    ]
+  },
+  {
+    "name": "Tuesday - Speed Mechanics + Football + Recovery Strength",
+    "notes": "Used when calves and upper body were mildly sore. Low-moderate intensity.",
+    "exercises": [
+      {
+        "name": "A-Skips",
+        "metric_kind": "distance_only",
+        "sets": [
+          { "distance": 0.015, "distance_unit": "km" },
+          { "distance": 0.015, "distance_unit": "km" }
+        ]
+      },
+      {
+        "name": "Straight-Leg Bounds",
+        "metric_kind": "distance_only",
+        "sets": [
+          { "distance": 0.015, "distance_unit": "km" },
+          { "distance": 0.015, "distance_unit": "km" }
+        ]
+      },
+      {
+        "name": "Acceleration Run",
+        "metric_kind": "distance_only",
+        "sets": [
+          { "distance": 0.015, "distance_unit": "km" },
+          { "distance": 0.015, "distance_unit": "km" },
+          { "distance": 0.015, "distance_unit": "km" },
+          { "distance": 0.015, "distance_unit": "km" },
+          { "distance": 0.02, "distance_unit": "km" },
+          { "distance": 0.02, "distance_unit": "km" },
+          { "distance": 0.02, "distance_unit": "km" }
+        ]
+      },
+      {
+        "name": "Football Practice",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 1800 }]
+      },
+      {
+        "name": "Single Arm Farmer Carry",
+        "metric_kind": "time_weight",
+        "sets": [
+          { "weight": 20, "weight_unit": "kg", "time_seconds": 30 },
+          { "weight": 20, "weight_unit": "kg", "time_seconds": 30 },
+          { "weight": 20, "weight_unit": "kg", "time_seconds": 30 }
+        ]
+      },
+      {
+        "name": "Bear Plank Shoulder Taps",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 20 }, { "reps": 20 }]
+      },
+      {
+        "name": "Dead Bug",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 8 }, { "reps": 8 }]
+      },
+      {
+        "name": "Glute Bridge with Ball Squeeze",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 12 }, { "reps": 12 }]
+      },
+      {
+        "name": "Bent Knee Soleus Raise",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 15 }, { "reps": 15 }]
+      },
+      {
+        "name": "Stationary Bike",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 600 }]
+      }
+    ]
+  },
+  {
+    "name": "Thursday - Match Prep Recovery",
+    "notes": "Day before Friday match. Recovery and activation only.",
+    "exercises": [
+      {
+        "name": "Football Practice",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 1200 }]
+      },
+      {
+        "name": "Glute Bridge",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 10 }, { "reps": 10 }]
+      },
+      {
+        "name": "Bear Plank",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 20 }, { "time_seconds": 20 }]
+      },
+      {
+        "name": "Standing Calf Raise",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 15 }, { "reps": 15 }]
+      },
+      {
+        "name": "Adductor Ball Squeeze Hold",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 20 }, { "time_seconds": 20 }]
+      },
+      {
+        "name": "Pool Walking",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 900 }]
+      },
+      {
+        "name": "Sauna",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 600 }]
+      }
+    ]
+  },
+  {
+    "name": "Monday - Performance Lower Body + Acceleration",
+    "notes": "Planned Monday performance session. Use only when no shin, groin, calf, or lower-back flare-up.",
+    "exercises": [
+      {
+        "name": "Wall Drives",
+        "metric_kind": "bodyweight_reps",
+        "sets": [
+          { "reps": 10, "is_warmup": true },
+          { "reps": 10, "is_warmup": true }
+        ]
+      },
+      {
+        "name": "A-Skips",
+        "metric_kind": "distance_only",
+        "sets": [
+          { "distance": 0.02, "distance_unit": "km", "is_warmup": true },
+          { "distance": 0.02, "distance_unit": "km", "is_warmup": true }
+        ]
+      },
+      {
+        "name": "10m Accelerations",
+        "metric_kind": "distance_only",
+        "sets": [
+          { "distance": 0.01, "distance_unit": "km" },
+          { "distance": 0.01, "distance_unit": "km" },
+          { "distance": 0.01, "distance_unit": "km" },
+          { "distance": 0.01, "distance_unit": "km" },
+          { "distance": 0.01, "distance_unit": "km" },
+          { "distance": 0.01, "distance_unit": "km" }
+        ]
+      },
+      {
+        "name": "20m Accelerations",
+        "metric_kind": "distance_only",
+        "sets": [
+          { "distance": 0.02, "distance_unit": "km" },
+          { "distance": 0.02, "distance_unit": "km" },
+          { "distance": 0.02, "distance_unit": "km" },
+          { "distance": 0.02, "distance_unit": "km" }
+        ]
+      },
+      {
+        "name": "Smith Machine Split Squat",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 30, "weight_unit": "kg", "reps": 6, "is_warmup": true },
+          { "weight": 50, "weight_unit": "kg", "reps": 6 },
+          { "weight": 50, "weight_unit": "kg", "reps": 6 },
+          { "weight": 50, "weight_unit": "kg", "reps": 6 },
+          { "weight": 50, "weight_unit": "kg", "reps": 6 }
+        ]
+      },
+      {
+        "name": "Lying Leg Curl",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 35, "weight_unit": "kg", "reps": 10 },
+          { "weight": 40, "weight_unit": "kg", "reps": 10 },
+          { "weight": 40, "weight_unit": "kg", "reps": 10 },
+          { "weight": 40, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "Box Step-Up + Knee Drive",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 10, "weight_unit": "kg", "reps": 6 },
+          { "weight": 10, "weight_unit": "kg", "reps": 6 },
+          { "weight": 10, "weight_unit": "kg", "reps": 6 }
+        ]
+      },
+      {
+        "name": "Standing Single Leg Calf Raise",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 20, "weight_unit": "kg", "reps": 12 },
+          { "weight": 20, "weight_unit": "kg", "reps": 12 },
+          { "weight": 20, "weight_unit": "kg", "reps": 12 },
+          { "weight": 20, "weight_unit": "kg", "reps": 12 }
+        ]
+      },
+      {
+        "name": "Bent Knee Soleus Raise",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 20, "weight_unit": "kg", "reps": 15 },
+          { "weight": 20, "weight_unit": "kg", "reps": 15 },
+          { "weight": 20, "weight_unit": "kg", "reps": 15 },
+          { "weight": 20, "weight_unit": "kg", "reps": 15 }
+        ]
+      },
+      {
+        "name": "Adductor Ball Squeeze Hold",
+        "metric_kind": "time_only",
+        "sets": [
+          { "time_seconds": 20 },
+          { "time_seconds": 20 },
+          { "time_seconds": 20 },
+          { "time_seconds": 20 }
+        ]
+      },
+      {
+        "name": "Bear Plank",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 30 }, { "time_seconds": 30 }, { "time_seconds": 30 }]
+      }
+    ]
+  },
+  {
+    "name": "Tuesday - Upper Athletic + Football",
+    "notes": "Planned Tuesday upper athletic session with light-moderate football technical work.",
+    "exercises": [
+      {
+        "name": "Football Practice",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 2700 }]
+      },
+      {
+        "name": "Chin-up",
+        "metric_kind": "bodyweight_reps",
+        "sets": [
+          { "reps": 5, "is_warmup": true },
+          { "reps": 8 },
+          { "reps": 6 },
+          { "reps": 6 },
+          { "reps": 5 }
+        ]
+      },
+      {
+        "name": "Dumbbell Bench Press",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 15, "weight_unit": "kg", "reps": 10, "is_warmup": true },
+          { "weight": 20, "weight_unit": "kg", "reps": 8 },
+          { "weight": 20, "weight_unit": "kg", "reps": 8 },
+          { "weight": 20, "weight_unit": "kg", "reps": 8 },
+          { "weight": 20, "weight_unit": "kg", "reps": 8 }
+        ]
+      },
+      {
+        "name": "Half Kneeling Single Arm Press",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 12.5, "weight_unit": "kg", "reps": 8 },
+          { "weight": 12.5, "weight_unit": "kg", "reps": 8 },
+          { "weight": 12.5, "weight_unit": "kg", "reps": 8 }
+        ]
+      },
+      {
+        "name": "Single Arm Cable Row",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 30, "weight_unit": "kg", "reps": 10 },
+          { "weight": 35, "weight_unit": "kg", "reps": 10 },
+          { "weight": 35, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "Lat Pulldown",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 40, "weight_unit": "kg", "reps": 10 },
+          { "weight": 45, "weight_unit": "kg", "reps": 10 },
+          { "weight": 45, "weight_unit": "kg", "reps": 10 }
+        ]
+      },
+      {
+        "name": "Single Arm Farmer Carry",
+        "metric_kind": "time_weight",
+        "sets": [
+          { "weight": 22.5, "weight_unit": "kg", "time_seconds": 30 },
+          { "weight": 22.5, "weight_unit": "kg", "time_seconds": 30 },
+          { "weight": 22.5, "weight_unit": "kg", "time_seconds": 30 }
+        ]
+      },
+      {
+        "name": "Bear Plank Shoulder Taps",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 20 }, { "reps": 20 }, { "reps": 20 }]
+      },
+      {
+        "name": "Standing Single Leg Calf Raise",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 15, "weight_unit": "kg", "reps": 12 },
+          { "weight": 15, "weight_unit": "kg", "reps": 12 },
+          { "weight": 15, "weight_unit": "kg", "reps": 12 }
+        ]
+      },
+      {
+        "name": "Glute Bridge Hold",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 20 }, { "time_seconds": 20 }]
+      }
+    ]
+  },
+  {
+    "name": "Wednesday - Sprint Endurance + Movement",
+    "notes": "Planned conditioning and movement quality day. Keep intensity submaximal before Friday match week.",
+    "exercises": [
+      {
+        "name": "Football Practice",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 1800 }]
+      },
+      {
+        "name": "Tempo Runs",
+        "metric_kind": "distance_only",
+        "sets": [
+          { "distance": 0.06, "distance_unit": "km" },
+          { "distance": 0.06, "distance_unit": "km" },
+          { "distance": 0.06, "distance_unit": "km" },
+          { "distance": 0.06, "distance_unit": "km" },
+          { "distance": 0.06, "distance_unit": "km" },
+          { "distance": 0.06, "distance_unit": "km" },
+          { "distance": 0.06, "distance_unit": "km" },
+          { "distance": 0.06, "distance_unit": "km" }
+        ]
+      },
+      {
+        "name": "Lateral Bounds",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 5 }, { "reps": 5 }]
+      },
+      {
+        "name": "Single Leg RDL Reach to Hop",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 5 }, { "reps": 5 }]
+      },
+      {
+        "name": "Pull-up",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 6 }, { "reps": 5 }, { "reps": 5 }]
+      },
+      {
+        "name": "Push-up",
+        "metric_kind": "bodyweight_reps",
+        "sets": [{ "reps": 15 }, { "reps": 12 }, { "reps": 10 }]
+      },
+      {
+        "name": "Bent Knee Soleus Raise",
+        "metric_kind": "weight_reps",
+        "sets": [
+          { "weight": 20, "weight_unit": "kg", "reps": 15 },
+          { "weight": 20, "weight_unit": "kg", "reps": 15 },
+          { "weight": 20, "weight_unit": "kg", "reps": 15 }
+        ]
+      },
+      {
+        "name": "Adductor Ball Squeeze Hold",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 20 }, { "time_seconds": 20 }, { "time_seconds": 20 }]
+      },
+      {
+        "name": "Mobility",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 600 }]
+      }
+    ]
+  },
+  {
+    "name": "Friday - Match Day",
+    "notes": "Match day tracking template.",
+    "exercises": [
+      {
+        "name": "Match",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 3600 }]
+      },
+      {
+        "name": "Walking",
+        "metric_kind": "time_only",
+        "sets": [{ "time_seconds": 300 }]
+      }
+    ]
+  }
+]

@@ -1,0 +1,137 @@
+{
+  "mon": {
+    "name": "Lower Strength + Power",
+    "notes": "MD-4, heaviest day. Loads from your history — progress when the last set feels easy. Split squat / SL RDL / step-up / calf are PER LEG. Drive up explosively on every rep. Rest 90-120s on the main lifts.",
+    "exercises": [
+      { "name": "Pogo Jumps", "sets": [{ "reps": 12 }, { "reps": 12 }, { "reps": 12 }] },
+      { "name": "Box Step-Up + Knee Drive", "sets": [
+        { "weight": 7.5, "weight_unit": "kg", "reps": 5 },
+        { "weight": 7.5, "weight_unit": "kg", "reps": 5 },
+        { "weight": 7.5, "weight_unit": "kg", "reps": 5 }
+      ] },
+      { "name": "Smith Machine Split Squat", "sets": [
+        { "weight": 20, "weight_unit": "kg", "reps": 6, "is_warmup": true },
+        { "weight": 35, "weight_unit": "kg", "reps": 5 },
+        { "weight": 35, "weight_unit": "kg", "reps": 5 },
+        { "weight": 35, "weight_unit": "kg", "reps": 5 },
+        { "weight": 35, "weight_unit": "kg", "reps": 5 }
+      ] },
+      { "name": "Single Leg RDL", "sets": [
+        { "weight": 10, "weight_unit": "kg", "reps": 6 },
+        { "weight": 10, "weight_unit": "kg", "reps": 6 },
+        { "weight": 10, "weight_unit": "kg", "reps": 6 },
+        { "weight": 10, "weight_unit": "kg", "reps": 6 }
+      ] },
+      { "name": "Lying Leg Curl", "sets": [
+        { "weight": 25, "weight_unit": "kg", "reps": 8 },
+        { "weight": 25, "weight_unit": "kg", "reps": 8 },
+        { "weight": 25, "weight_unit": "kg", "reps": 8 }
+      ] },
+      { "name": "Standing Single Leg Calf Raise", "sets": [
+        { "weight": 12.5, "weight_unit": "kg", "reps": 8 },
+        { "weight": 12.5, "weight_unit": "kg", "reps": 8 },
+        { "weight": 12.5, "weight_unit": "kg", "reps": 8 },
+        { "weight": 12.5, "weight_unit": "kg", "reps": 8 }
+      ] },
+      { "name": "Plank DB Pull Through", "sets": [
+        { "weight": 10, "weight_unit": "kg", "reps": 10 },
+        { "weight": 10, "weight_unit": "kg", "reps": 10 },
+        { "weight": 10, "weight_unit": "kg", "reps": 10 }
+      ] }
+    ]
+  },
+  "tue": {
+    "name": "Top Speed + Upper",
+    "notes": "MD-3. SPRINTS FIRST, fully fresh: 3 build-ups (70/80/90%), then 5-6 x ~30m flying sprints (10m run-in then 20m at 95-100%), full 2-3 min walk-back. Stop when speed drops — quality only. Sprints logged as 'Acceleration Run' (0.03km). No weighted pull-ups. 1-Arm DB Row is new — find a weight you control for 8 clean reps.",
+    "exercises": [
+      { "name": "Acceleration Run", "sets": [
+        { "distance": 0.03, "distance_unit": "km", "is_warmup": true },
+        { "distance": 0.03, "distance_unit": "km", "is_warmup": true },
+        { "distance": 0.03, "distance_unit": "km", "is_warmup": true },
+        { "distance": 0.03, "distance_unit": "km" },
+        { "distance": 0.03, "distance_unit": "km" },
+        { "distance": 0.03, "distance_unit": "km" },
+        { "distance": 0.03, "distance_unit": "km" },
+        { "distance": 0.03, "distance_unit": "km" },
+        { "distance": 0.03, "distance_unit": "km" }
+      ] },
+      { "name": "Pull-up", "sets": [{ "reps": 6 }, { "reps": 6 }, { "reps": 5 }, { "reps": 5 }] },
+      { "name": "Incline Dumbbell Press", "sets": [
+        { "weight": 20, "weight_unit": "kg", "reps": 8 },
+        { "weight": 20, "weight_unit": "kg", "reps": 8 },
+        { "weight": 20, "weight_unit": "kg", "reps": 8 },
+        { "weight": 20, "weight_unit": "kg", "reps": 8 }
+      ] },
+      { "name": "Dumbbell Row", "sets": [
+        { "weight": 22.5, "weight_unit": "kg", "reps": 8 },
+        { "weight": 22.5, "weight_unit": "kg", "reps": 8 },
+        { "weight": 22.5, "weight_unit": "kg", "reps": 8 }
+      ] },
+      { "name": "Half Kneeling Single Arm Press", "sets": [
+        { "weight": 12.5, "weight_unit": "kg", "reps": 8 },
+        { "weight": 12.5, "weight_unit": "kg", "reps": 8 },
+        { "weight": 12.5, "weight_unit": "kg", "reps": 8 }
+      ] },
+      { "name": "Dumbbell Bicep Curl", "sets": [
+        { "weight": 12.5, "weight_unit": "kg", "reps": 10 },
+        { "weight": 12.5, "weight_unit": "kg", "reps": 10 },
+        { "weight": 12.5, "weight_unit": "kg", "reps": 10 }
+      ] },
+      { "name": "DB Skullcrusher", "sets": [
+        { "weight": 7.5, "weight_unit": "kg", "reps": 10 },
+        { "weight": 7.5, "weight_unit": "kg", "reps": 10 },
+        { "weight": 7.5, "weight_unit": "kg", "reps": 10 }
+      ] }
+    ]
+  },
+  "wed": {
+    "name": "Acceleration + Repeated Sprint",
+    "notes": "MD-2. Accelerations: 8 x 20m from a falling start, walk-back 45-60s. Then repeated sprints: 2 sets of 6 x 30m (logged as 'Repeat Sprint Session'), 25-30s between reps, 3-4 min between sets — trains finishing games strong. Gym work kept light 2 days out. If you play a midweek game today, SKIP the repeat-sprint block.",
+    "exercises": [
+      { "name": "20m Accelerations", "sets": [
+        { "distance": 0.02, "distance_unit": "km" },
+        { "distance": 0.02, "distance_unit": "km" },
+        { "distance": 0.02, "distance_unit": "km" },
+        { "distance": 0.02, "distance_unit": "km" },
+        { "distance": 0.02, "distance_unit": "km" },
+        { "distance": 0.02, "distance_unit": "km" },
+        { "distance": 0.02, "distance_unit": "km" },
+        { "distance": 0.02, "distance_unit": "km" }
+      ] },
+      { "name": "Repeat Sprint Session", "sets": [
+        { "distance": 0.18, "distance_unit": "km", "time_seconds": 180 },
+        { "distance": 0.18, "distance_unit": "km", "time_seconds": 180 }
+      ] },
+      { "name": "Smith Machine Split Squat", "sets": [
+        { "weight": 30, "weight_unit": "kg", "reps": 6 },
+        { "weight": 30, "weight_unit": "kg", "reps": 6 },
+        { "weight": 30, "weight_unit": "kg", "reps": 6 }
+      ] },
+      { "name": "Bent Knee Soleus Raise", "sets": [
+        { "weight": 20, "weight_unit": "kg", "reps": 15 },
+        { "weight": 20, "weight_unit": "kg", "reps": 15 },
+        { "weight": 20, "weight_unit": "kg", "reps": 15 }
+      ] },
+      { "name": "Adductor Ball Squeeze Hold", "sets": [
+        { "time_seconds": 30 }, { "time_seconds": 30 }, { "time_seconds": 30 }
+      ] },
+      { "name": "Dead Bug", "sets": [{ "reps": 8 }, { "reps": 8 }, { "reps": 8 }] }
+    ]
+  },
+  "thu": {
+    "name": "Match Primer",
+    "notes": "MD-1, ~25 min. Stay springy, NEVER fatigued. Tiny volume, max intent. The 4 accels are at ~90% — feel fast, don't max out. Activation sets are bodyweight.",
+    "exercises": [
+      { "name": "Pogo Jumps", "sets": [{ "reps": 10 }, { "reps": 10 }, { "reps": 10 }] },
+      { "name": "Single Leg RDL Reach to Hop", "sets": [{ "reps": 4 }, { "reps": 4 }, { "reps": 4 }] },
+      { "name": "20m Accelerations", "sets": [
+        { "distance": 0.02, "distance_unit": "km" },
+        { "distance": 0.02, "distance_unit": "km" },
+        { "distance": 0.02, "distance_unit": "km" },
+        { "distance": 0.02, "distance_unit": "km" }
+      ] },
+      { "name": "Glute Bridge", "sets": [{ "weight": 0, "weight_unit": "kg", "reps": 12 }] },
+      { "name": "Standing Calf Raise", "sets": [{ "weight": 0, "weight_unit": "kg", "reps": 15 }] }
+    ]
+  }
+}
