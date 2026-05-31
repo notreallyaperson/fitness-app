@@ -31,6 +31,11 @@ docker compose --env-file .env.production up -d --build
 curl -s localhost:3001/api/health    # -> {"ok":true}
 ```
 
+> **Always pass `--env-file .env.production`.** The `NEXT_PUBLIC_*` values are
+> read at build time from that file. A plain `docker compose up --build` (no
+> `--env-file`) leaves them blank — compose now fails fast telling you to add
+> the flag, rather than crashing deep inside `next build`.
+
 > **Small instances (t2/t3.micro):** a Next.js build can run out of memory.
 > Either add swap, or build elsewhere and pull the image:
 >

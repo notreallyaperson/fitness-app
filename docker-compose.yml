@@ -9,10 +9,13 @@ services:
   web:
     build:
       context: .
+      # These resolve from the --env-file (see comment above). The :? guards
+      # fail fast with a clear message instead of passing blank strings (which
+      # would otherwise blow up deep inside `next build` env validation).
       args:
-        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+        NEXT_PUBLIC_SUPABASE_URL: "${NEXT_PUBLIC_SUPABASE_URL:?missing env — deploy with --env-file .env.production}"
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: "${NEXT_PUBLIC_SUPABASE_ANON_KEY:?missing env — deploy with --env-file .env.production}"
+        NEXT_PUBLIC_APP_URL: "${NEXT_PUBLIC_APP_URL:?missing env — deploy with --env-file .env.production}"
     image: exercise-app:latest
     env_file:
       - .env.production
