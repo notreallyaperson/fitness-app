@@ -1,0 +1,25 @@
+# Production compose used on EC2. Pulls a prebuilt image from GHCR (built by
+# GitHub Actions) — no build happens on the instance.
+#
+#   docker login ghcr.io
+#   docker compose -f docker-compose.prod.yml pull
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# IMAGE_TAG defaults to "latest"; pin a specific build for rollback, e.g.
+#   IMAGE_TAG=sha-1a2b3c4 docker compose -f docker-compose.prod.yml up -d
+
+services:
+  web:
+    image: ghcr.io/notreallyaperson/fitness-app:${IMAGE_TAG:-latest}
+    env_file:
+      - .env.production
+    # Bind to localhost only — the existing nginx is the sole public entry point.
+    ports:
+      - "127.0.0.1:3001:3000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
