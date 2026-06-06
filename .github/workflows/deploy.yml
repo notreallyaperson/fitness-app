@@ -31,6 +31,9 @@ jobs:
   build-push:
     needs: verify
     runs-on: ubuntu-latest
+    # The NEXT_PUBLIC_* build values live as secrets under the "Live"
+    # environment, so this job must opt into it to read them.
+    environment: Live
     permissions:
       contents: read
       packages: write
@@ -70,6 +73,8 @@ jobs:
   deploy:
     needs: build-push
     runs-on: ubuntu-latest
+    # EC2_* deploy secrets also live under the "Live" environment.
+    environment: Live
     steps:
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
