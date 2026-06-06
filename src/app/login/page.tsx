@@ -78,13 +78,13 @@ export default function LoginPage() {
           <h1 className="text-xl font-semibold">Enter code</h1>
           {notice && <p className="text-sm text-muted-foreground">{notice}</p>}
           <div className="space-y-2">
-            <Label htmlFor="code">6-digit code</Label>
+            <Label htmlFor="code">Code from your email</Label>
             <Input
               id="code"
               name="code"
               inputMode="numeric"
               autoComplete="one-time-code"
-              maxLength={6}
+              maxLength={10}
               required
               autoFocus
               value={code}
@@ -92,7 +92,7 @@ export default function LoginPage() {
               className="text-center font-mono text-lg tracking-[0.4em]"
             />
           </div>
-          <Button type="submit" className="w-full" disabled={pending || code.length !== 6}>
+          <Button type="submit" className="w-full" disabled={pending || code.length < 6}>
             {pending ? "Verifying…" : "Verify & sign in"}
           </Button>
           {error && <p className="text-sm text-destructive">{error}</p>}

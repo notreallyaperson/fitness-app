@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-/** A 6-digit email OTP code (trimmed before checking). */
-export const OtpTokenSchema = z.string().trim().regex(/^\d{6}$/);
+/** An email OTP code — Supabase allows 6–10 digits (configurable). Trimmed. */
+export const OtpTokenSchema = z.string().trim().regex(/^\d{6,10}$/);
 
 export const SetInputSchema = z.object({
   reps: z.number().int().nonnegative().nullable().optional(),

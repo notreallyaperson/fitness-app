@@ -2,15 +2,18 @@ import { describe, it, expect } from "vitest";
 import { OtpTokenSchema } from "@/lib/validation";
 
 describe("OtpTokenSchema", () => {
-  it("accepts a 6-digit code", () => {
-    expect(OtpTokenSchema.parse("123456")).toBe("123456");
-  });
+  it.each(["123456", "1234567", "12345678", "1234567890"])(
+    "accepts a %s-length digit code",
+    (good) => {
+      expect(OtpTokenSchema.parse(good)).toBe(good);
+    },
+  );
 
   it("trims surrounding whitespace", () => {
-    expect(OtpTokenSchema.parse(" 123456 ")).toBe("123456");
+    expect(OtpTokenSchema.parse(" 12345678 ")).toBe("12345678");
   });
 
-  it.each(["12345", "1234567", "abcdef", "12 456", "", "12.456"])(
+  it.each(["12345", "12345678901", "abcdef", "12 456", "", "12.456"])(
     "rejects %j",
     (bad) => {
       expect(() => OtpTokenSchema.parse(bad)).toThrow();
