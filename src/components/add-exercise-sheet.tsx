@@ -15,17 +15,33 @@ export function AddExerciseSheet({
   triggerNode,
   onPick,
   defaultEquipment = [],
+  open: openProp,
+  onOpenChange,
+  title = "Add exercise",
+  actionLabel = "Add",
 }: {
   triggerLabel?: string;
   triggerVariant?: "default" | "outline" | "secondary" | "ghost" | "destructive" | "link";
   triggerNode?: React.ReactElement;
   onPick: (exerciseId: string) => Promise<void> | void;
   defaultEquipment?: EquipmentType[];
+  /** Controlled open state. When provided, the sheet renders no trigger. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  title?: string;
+  actionLabel?: string;
 }) {
   const [q, setQ] = useState("");
   const [results, setResults] = useState<Exercise[]>([]);
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [, startTransition] = useTransition();
+
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : internalOpen;
+  const setOpen = (next: boolean) => {
+    if (!isControlled) setInternalOpen(next);
+    onOpenChange?.(next);
+  };
 
   const refresh = (next: string) => {
     setQ(next);
@@ -40,7 +56,7 @@ export function AddExerciseSheet({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      {triggerNode ? (
+      {isControlled ? null : triggerNode ? (
         // triggerNode can be a non-button element (e.g. a menuitem), so tell
         // Base UI not to expect native <button> semantics.
         <SheetTrigger render={triggerNode} nativeButton={false} />
@@ -55,7 +71,7 @@ export function AddExerciseSheet({
       >
         <div className="mx-auto mb-1 h-1.5 w-10 rounded-full bg-border" />
         <SheetTitle className="text-lg font-bold tracking-[-0.02em]">
-          Add exercise
+          {title}
         </SheetTitle>
         <div className="space-y-3 pt-3">
           <Input
@@ -92,7 +108,7 @@ export function AddExerciseSheet({
                     setOpen(false);
                   }}
                 >
-                  Add
+                  {actionLabel}
                 </Button>
               </li>
             ))}

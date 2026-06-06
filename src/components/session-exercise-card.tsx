@@ -45,6 +45,7 @@ export function SessionExerciseCard({
   sets,
 }: Props) {
   const [restStartedAt, setRestStartedAt] = useState<number | null>(null);
+  const [replaceOpen, setReplaceOpen] = useState(false);
 
   const isTimed =
     metricKind === "time_only" ||
@@ -78,7 +79,9 @@ export function SessionExerciseCard({
             }
           />
           <DropdownMenuContent align="end">
-            <ReplaceMenuItem sessionId={sessionId} rowId={rowId} />
+            <DropdownMenuItem onClick={() => setReplaceOpen(true)}>
+              Replace…
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={async () => {
                 if (sets.length > 0) {
@@ -100,6 +103,31 @@ export function SessionExerciseCard({
             />
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* Rendered as a sibling of the menu — never nested inside the
+            DropdownMenu popup, which would tear down the sheet on close. */}
+        <AddExerciseSheet
+          open={replaceOpen}
+          onOpenChange={setReplaceOpen}
+          title="Replace exercise"
+          actionLabel="Replace"
+          onPick={async (newId) => {
+            const result = await replaceSessionExerciseAction(
+              sessionId,
+              rowId,
+              newId,
+            );
+            if (result?.needsConfirmation) {
+              const ok = window.confirm(
+                `This will discard ${result.setsCount} logged set(s) on the current exercise. Continue?`,
+              );
+              if (!ok) return;
+              await replaceSessionExerciseAction(sessionId, rowId, newId, {
+                confirm: true,
+              });
+            }
+          }}
+        />
       </div>
 
       {sets.length > 0 && (
@@ -130,38 +158,5 @@ export function SessionExerciseCard({
         />
       </div>
     </div>
-  );
-}
-
-function ReplaceMenuItem({
-  sessionId,
-  rowId,
-}: {
-  sessionId: string;
-  rowId: string;
-}) {
-  return (
-    <AddExerciseSheet
-      triggerNode={
-        <div
-          role="menuitem"
-          className="flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm select-none hover:bg-muted"
-        >
-          Replace…
-        </div>
-      }
-      onPick={async (newId) => {
-        const result = await replaceSessionExerciseAction(sessionId, rowId, newId);
-        if (result?.needsConfirmation) {
-          const ok = window.confirm(
-            `This will discard ${result.setsCount} logged set(s) on the current exercise. Continue?`,
-          );
-          if (!ok) return;
-          await replaceSessionExerciseAction(sessionId, rowId, newId, {
-            confirm: true,
-          });
-        }
-      }}
-    />
   );
 }
