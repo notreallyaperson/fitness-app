@@ -133,7 +133,14 @@ export function SessionExerciseCard({
       {sets.length > 0 && (
         <div className="mt-3 divide-y divide-border rounded-md bg-card px-3 py-1">
           {sets.map((s) => (
-            <SetRow key={s.id} sessionId={sessionId} set={s} />
+            <SetRow
+              key={s.id}
+              sessionId={sessionId}
+              set={s}
+              metricKind={metricKind}
+              weightUnit={weightUnit}
+              distanceUnit={distanceUnit}
+            />
           ))}
         </div>
       )}

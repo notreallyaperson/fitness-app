@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { NumberStepper } from "@/components/ui/number-stepper";
 import { cn } from "@/lib/utils";
+import { METRIC_FIELDS } from "@/lib/metric-fields";
 import type { MetricKind } from "@/lib/types/domain";
 import { appendSetAction } from "@/server/actions/sessions";
 
@@ -27,20 +28,6 @@ interface Props {
   onLogged?: () => void;
 }
 
-const FIELDS: Record<
-  MetricKind,
-  { reps?: boolean; weight?: boolean; time?: boolean; distance?: boolean }
-> = {
-  weight_reps: { reps: true, weight: true },
-  bodyweight_reps: { reps: true },
-  weighted_bodyweight_reps: { reps: true, weight: true },
-  time_only: { time: true },
-  time_weight: { time: true, weight: true },
-  distance_only: { distance: true },
-  distance_time: { distance: true, time: true },
-  none: {},
-};
-
 export function SetLogForm({
   sessionId,
   sessionExerciseId,
@@ -49,7 +36,7 @@ export function SetLogForm({
   defaultDistanceUnit,
   onLogged,
 }: Props) {
-  const f = FIELDS[metricKind];
+  const f = METRIC_FIELDS[metricKind];
   const [reps, setReps] = useState("");
   const [weight, setWeight] = useState("");
   const [time, setTime] = useState("");
