@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+/** A 6-digit email OTP code (trimmed before checking). */
+export const OtpTokenSchema = z.string().trim().regex(/^\d{6}$/);
+
 export const SetInputSchema = z.object({
   reps: z.number().int().nonnegative().nullable().optional(),
   weight: z.number().nonnegative().nullable().optional(),
