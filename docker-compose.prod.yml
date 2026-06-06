@@ -13,13 +13,26 @@ services:
     image: ghcr.io/notreallyaperson/fitness-app:${IMAGE_TAG:-latest}
     env_file:
       - .env.production
-    # Bind to localhost only — the existing nginx is the sole public entry point.
+    # Bind to localhost only (handy for `curl localhost:3001/api/health`); the
+    # public entry point is the tax-tool nginx, which reaches this container by
+    # its `fitness-app` alias on the shared network below.
     ports:
       - "127.0.0.1:3001:3000"
     restart: unless-stopped
+    networks:
+      default: {}
+      taxnet:
+        aliases:
+          - fitness-app
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 20s
+
+networks:
+  # The existing tax-tool stack's network, so nginx can resolve `fitness-app`.
+  taxnet:
+    external: true
+    name: tax-tool_tax-tool-net
