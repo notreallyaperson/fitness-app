@@ -86,10 +86,26 @@ jobs:
           script: |
             set -euo pipefail
             cd "${APP_DIR:-$HOME/fitness-app}"
-            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+
+            # Retry network steps so a transient registry/DNS blip (e.g. the
+            # "ghcr.io/v2/: EOF" handshake error) doesn't fail the whole deploy.
+            retry() {
+              local n=1 max=3 delay=5
+              until "$@"; do
+                if [ "$n" -ge "$max" ]; then
+                  echo "FAILED after $n attempts: $*" >&2
+                  return 1
+                fi
+                echo "attempt $n failed; retrying in ${delay}s..." >&2
+                sleep "$delay"; n=$((n + 1)); delay=$((delay * 2))
+              done
+            }
+            ghcr_login() { echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin; }
+
             git pull --ff-only
             export IMAGE_TAG
-            docker compose -f docker-compose.prod.yml pull
+            retry ghcr_login
+            retry docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
             docker image prune -f
         env:
