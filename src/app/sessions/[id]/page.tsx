@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { getSession } from "@/lib/db/sessions";
 import { getMyProfile } from "@/lib/db/profiles";
+import { serverNowMs } from "@/lib/now";
 import { SessionHeader } from "@/components/session-header";
 import { ReorderableList } from "@/components/reorderable-list";
 import { SessionExerciseCard } from "@/components/session-exercise-card";
@@ -55,6 +56,7 @@ export default async function LiveSessionPage({
         startedAt={session.started_at}
         endedAt={session.ended_at}
         pauseIntervals={(session.pause_intervals as PauseInterval[]) ?? []}
+        nowMs={serverNowMs()}
         bodyweight={session.bodyweight ? Number(session.bodyweight) : null}
         weightUnit={profile.units_weight}
         equipment={equipment}

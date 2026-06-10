@@ -30,6 +30,9 @@ interface Props {
   startedAt: string;
   endedAt: string | null;
   pauseIntervals: PauseInterval[];
+  /** Server render time (ms). Seeds the clock so SSR and the first client
+   *  render agree — avoids a hydration mismatch and the elapsed-time jump. */
+  nowMs: number;
   bodyweight: number | null;
   weightUnit: "kg" | "lbs";
   equipment: string[];
@@ -43,13 +46,14 @@ export function SessionHeader({
   startedAt,
   endedAt,
   pauseIntervals,
+  nowMs,
   bodyweight,
   weightUnit,
   equipment,
   notes,
 }: Props) {
   const [, startTransition] = useTransition();
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(nowMs);
 
   const paused = isPaused(pauseIntervals);
 
@@ -58,6 +62,8 @@ export function SessionHeader({
   // the interval on a possibly-stale `paused` flag could wrongly stop the clock.
   useEffect(() => {
     if (endedAt) return;
+    // Seeded from the server render time (nowMs); the interval takes over with
+    // the client clock on the first tick.
     const i = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(i);
   }, [endedAt]);
