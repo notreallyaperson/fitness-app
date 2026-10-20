@@ -1,4 +1,6 @@
-# Fitness migration to world — prepared, not deployed
+# Fitness migration to world — preparation and runbook
+
+Current approved setup status is recorded in [world-setup-status.md](world-setup-status.md); it supersedes preparation-only status below. No app has moved.
 
 Source frozen at `3eadde8f1c77c2aac9b7d5f1d2fec1892febed66`. Local branch `codex/world-migration`. Source host and unrelated repositories are unchanged. This package is not applied and contains no secrets. All live steps below require the specific approvals listed at the end.
 
