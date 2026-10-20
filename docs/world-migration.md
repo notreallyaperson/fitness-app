@@ -71,6 +71,29 @@ Resource accounting: the configuration still declares **ten Terraform-managed re
 
 Official references: https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws ; https://docs.github.com/en/rest/deployments/environments ; https://docs.github.com/en/rest/deployments/branch-policies
 
+## Canonical redirect regression — local repair
+
+The bounded world test found the no-code auth callback redirecting to the standalone server's internal `0.0.0.0:3000` origin. The root middleware's raw header was relative `/login`; curl's `redirect_url` expanded it against the internal test URL, so that expansion alone was not evidence of an external root redirect. Acceptance checks must inspect raw `Location` headers without following them.
+
+The repair constructs fixed login/home redirects from the trusted, build-time `NEXT_PUBLIC_APP_URL`. Request Host, forwarded headers and query destinations cannot select the redirect origin. Production configuration must be an HTTPS origin without credentials, path, query or fragment; missing/invalid settings fail validation instead of falling back to request headers. Explicit loopback HTTP remains available only outside production. A trailing root slash is normalized. No auth-code exchange behavior, credentials, schema, deployment workflow or infrastructure is changed.
+
+Reproduce the standalone checks locally with synthetic settings only:
+
+```bash
+pnpm test
+pnpm exec tsc --noEmit
+docker build --platform linux/amd64 \
+  --build-arg NEXT_PUBLIC_SUPABASE_URL=https://synthetic.invalid \
+  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=synthetic-only \
+  --build-arg NEXT_PUBLIC_APP_URL=https://fitness.qworky.tech \
+  -t fitness-canonical-redirects:fixed .
+python3 scripts/test-canonical-redirects.py fitness-canonical-redirects:fixed
+```
+
+The harness starts and removes only its own localhost-bound container, supplies one synthetic private runtime value, and inspects 24 anonymous/no-code HTTP responses with canonical, hostile and mixed proxy headers. It sends no login email, follows no redirect, and supplies no real auth code or session. Use the same harness with a native ARM image when approved publishing is available; local AMD64 verification uses the production Dockerfile and standalone runtime but is not native ARM proof.
+
+Public configuration is compiled into the image: rebuild rather than attempting a runtime public-origin override. This local repair does not authorize publication, a new task revision, another service start, TLS/DNS cutover or source shutdown. Repeat the separately approved bounded test with strict raw-header assertions after a new immutable candidate is reviewed. Owner backup/redirect-allowlist confirmation and public TLS/login acceptance remain cutover prerequisites.
+
 ## Approved merge / candidate publication
 
 The restricted publisher is now activated as `.github/workflows/world-publish.yml`, manual/main-only, with Live main-only verification before OIDC. It builds native ARM images, tests Caddy and synthetic health/login before pushing immutable ECR candidates. It has no ECS/SSM/DNS/IAM write scope. The legacy SSH deploy job remains disabled unless explicitly re-enabled.
