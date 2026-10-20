@@ -71,6 +71,9 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy:
+    # Migration safety: absent variable means the legacy tax-host deployment is off.
+    # Re-enable only as an explicitly approved rollback action.
+    if: ${{ vars.FITNESS_LEGACY_SSH_DEPLOY == 'true' }}
     needs: build-push
     runs-on: ubuntu-latest
     # EC2_* deploy secrets also live under the "Live" environment.

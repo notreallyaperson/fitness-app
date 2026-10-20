@@ -1,0 +1,51 @@
+name: Validate world ARM64 migration
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04-arm
+    environment: Live
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec tsc --noEmit && pnpm test
+      - name: Build ARM64 without publishing
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+        run: |
+          docker build --platform linux/arm64 --build-arg NEXT_PUBLIC_SUPABASE_URL --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY --build-arg NEXT_PUBLIC_APP_URL -t fitness-arm64:validation .
+          docker build --platform linux/arm64 -f deploy/world/Dockerfile.tls -t fitness-tls:validation .
+          test "$(docker image inspect fitness-arm64:validation --format '{{.Architecture}}')" = arm64
+          docker run --rm fitness-tls:validation caddy validate --config /etc/caddy/Caddyfile
+      - name: Smoke test without production credentials
+        run: |
+          docker run -d --name fitness-qa -p 127.0.0.1:3000:3000 -e HOSTNAME=0.0.0.0 -e NEXT_PUBLIC_APP_URL=https://fitness.qworky.tech -e NEXT_PUBLIC_SUPABASE_URL=https://synthetic.invalid -e NEXT_PUBLIC_SUPABASE_ANON_KEY=synthetic -e SUPABASE_SERVICE_ROLE_KEY=synthetic fitness-arm64:validation
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3000/api/health; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - if: always()
+        run: docker rm -f fitness-qa || true
+  infrastructure-safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.14"
+      - run: terraform -chdir=deploy/world init -backend=false
+      - run: terraform -chdir=deploy/world validate
+      - run: terraform -chdir=deploy/world test
