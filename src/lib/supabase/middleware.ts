@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/types/database";
 import { publicEnv } from "@/lib/env";
+import { appUrl } from "@/lib/app-url";
 
 const PUBLIC_PATHS = ["/login", "/auth/callback"];
 
@@ -17,8 +18,7 @@ export async function updateSession(request: NextRequest) {
         setAll: (toSet) => {
           for (const { name, value } of toSet) request.cookies.set(name, value);
           response = NextResponse.next({ request });
-          for (const { name, value, options } of toSet)
-            response.cookies.set(name, value, options);
+          for (const { name, value, options } of toSet) response.cookies.set(name, value, options);
         },
       },
     },
@@ -30,9 +30,7 @@ export async function updateSession(request: NextRequest) {
   const url = request.nextUrl.pathname;
 
   if (!user && !PUBLIC_PATHS.some((p) => url.startsWith(p))) {
-    const redirect = request.nextUrl.clone();
-    redirect.pathname = "/login";
-    return NextResponse.redirect(redirect);
+    return NextResponse.redirect(appUrl(publicEnv.NEXT_PUBLIC_APP_URL, "/login"));
   }
   return response;
 }
