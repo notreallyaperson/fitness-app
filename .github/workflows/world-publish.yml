@@ -1,0 +1,56 @@
+# Approved candidate publication only: no ECS, secret or DNS mutation.
+name: Publish world candidate
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+jobs:
+  candidate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04-arm
+    environment: Live
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Live is restricted to branch main before AWS authentication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/verify-world-publisher-scope.py
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::240851517002:role/fitness-world-image-publisher
+          aws-region: us-east-1
+      - uses: aws-actions/amazon-ecr-login@v2
+      - uses: docker/setup-buildx-action@v3
+      - name: Build and verify ARM candidates before publishing
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+        run: |
+          registry=240851517002.dkr.ecr.us-east-1.amazonaws.com
+          docker buildx build --platform linux/arm64 --load --build-arg NEXT_PUBLIC_SUPABASE_URL --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY --build-arg NEXT_PUBLIC_APP_URL --tag "$registry/fitness-world-web:$GITHUB_SHA" .
+          docker buildx build --platform linux/arm64 --load -f deploy/world/Dockerfile.tls --tag "$registry/fitness-world-tls:$GITHUB_SHA" .
+          test "$(docker image inspect "$registry/fitness-world-web:$GITHUB_SHA" --format '{{.Architecture}}')" = arm64
+          docker run --rm "$registry/fitness-world-tls:$GITHUB_SHA" caddy validate --config /etc/caddy/Caddyfile
+          # Public Next config is compiled into the image. No public runtime keys or real private values are injected here.
+          docker run -d --name fitness-candidate -p 127.0.0.1:3000:3000 -e HOSTNAME=0.0.0.0 -e SUPABASE_SERVICE_ROLE_KEY=synthetic "$registry/fitness-world-web:$GITHUB_SHA"
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3000/api/health; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:3000/api/health
+          curl --fail --silent --output /dev/null http://127.0.0.1:3000/login
+      - name: Publish immutable candidates
+        run: |
+          registry=240851517002.dkr.ecr.us-east-1.amazonaws.com
+          docker push "$registry/fitness-world-web:$GITHUB_SHA"
+          docker push "$registry/fitness-world-tls:$GITHUB_SHA"
+          docker image inspect "$registry/fitness-world-web:$GITHUB_SHA" --format '{{index .RepoDigests 0}}' >> "$GITHUB_STEP_SUMMARY"
+          docker image inspect "$registry/fitness-world-tls:$GITHUB_SHA" --format '{{index .RepoDigests 0}}' >> "$GITHUB_STEP_SUMMARY"
+      - if: always()
+        run: docker rm -f fitness-candidate || true
+
+# The role cannot mutate ECS, IAM, SSM or DNS. Task registration remains an operator-reviewed Terraform plan.

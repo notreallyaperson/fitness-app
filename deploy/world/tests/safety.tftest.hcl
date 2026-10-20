@@ -19,8 +19,6 @@ mock_provider "aws" {
 variables {
   web_image_digest           = "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   tls_image_digest           = "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-  public_supabase_url        = "https://synthetic.invalid"
-  public_supabase_anon_key   = "synthetic"
   service_role_parameter_arn = "arn:aws:ssm:us-east-1:240851517002:parameter/secrets/production/fitness/SUPABASE_SERVICE_ROLE_KEY"
   openai_parameter_arn       = "arn:aws:ssm:us-east-1:240851517002:parameter/secrets/production/fitness/OPEN_AI_API_KEY"
   secret_kms_key_arn         = "arn:aws:kms:us-east-1:240851517002:key/00000000-0000-0000-0000-000000000000"

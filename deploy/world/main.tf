@@ -12,8 +12,6 @@ variable "enable_tls" {
 }
 variable "web_image_digest" { type = string }
 variable "tls_image_digest" { type = string }
-variable "public_supabase_url" { type = string }
-variable "public_supabase_anon_key" { type = string }
 variable "service_role_parameter_arn" { type = string }
 variable "openai_parameter_arn" { type = string }
 variable "secret_kms_key_arn" { type = string }
@@ -76,7 +74,7 @@ resource "aws_ecs_task_definition" "fitness" {
     {
       name             = "web", image = "${aws_ecr_repository.images["fitness-world-web"].repository_url}@${var.web_image_digest}", essential = true,
       cpu              = 224, memory = 512, memoryReservation = 128,
-      environment      = [{ name = "NODE_ENV", value = "production" }, { name = "HOSTNAME", value = "0.0.0.0" }, { name = "PORT", value = "3000" }, { name = "NEXT_PUBLIC_APP_URL", value = "https://fitness.qworky.tech" }, { name = "NEXT_PUBLIC_SUPABASE_URL", value = var.public_supabase_url }, { name = "NEXT_PUBLIC_SUPABASE_ANON_KEY", value = var.public_supabase_anon_key }],
+      environment      = [{ name = "NODE_ENV", value = "production" }, { name = "HOSTNAME", value = "0.0.0.0" }, { name = "PORT", value = "3000" }],
       portMappings     = [{ containerPort = 3000, hostPort = 0, protocol = "tcp" }],
       secrets          = [{ name = "SUPABASE_SERVICE_ROLE_KEY", valueFrom = var.service_role_parameter_arn }, { name = "OPEN_AI_API_KEY", valueFrom = var.openai_parameter_arn }],
       healthCheck      = { command = ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"], interval = 30, timeout = 5, retries = 3, startPeriod = 30 },
