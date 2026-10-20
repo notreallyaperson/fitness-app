@@ -1,0 +1,40 @@
+# Review-only. Install under .github/workflows only after resource/access approval.
+name: Publish world candidate
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+jobs:
+  candidate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04-arm
+    environment: Live
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Live is restricted to branch main before AWS authentication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/verify-world-publisher-scope.py
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::240851517002:role/fitness-world-image-publisher
+          aws-region: us-east-1
+      - uses: aws-actions/amazon-ecr-login@v2
+      - uses: docker/setup-buildx-action@v3
+      - name: Build and push immutable candidate only
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+        run: |
+          registry=240851517002.dkr.ecr.us-east-1.amazonaws.com
+          docker buildx build --platform linux/arm64 --build-arg NEXT_PUBLIC_SUPABASE_URL --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY --build-arg NEXT_PUBLIC_APP_URL --push --tag "$registry/fitness-world-web:$GITHUB_SHA" --metadata-file /tmp/web-metadata.json .
+          docker buildx build --platform linux/arm64 -f deploy/world/Dockerfile.tls --push --tag "$registry/fitness-world-tls:$GITHUB_SHA" --metadata-file /tmp/tls-metadata.json .
+          jq -r '."containerimage.digest"' /tmp/web-metadata.json
+          jq -r '."containerimage.digest"' /tmp/tls-metadata.json
+
+# No ECS, IAM, SSM or DNS mutations are permitted by this publisher role.
+# Operator reviews immutable digests in Terraform before task-definition rollout.

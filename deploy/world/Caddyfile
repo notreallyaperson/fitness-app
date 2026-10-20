@@ -1,0 +1,12 @@
+{
+  admin off
+  auto_https disable_redirects
+}
+fitness.qworky.tech {
+  tls {
+    issuer acme {
+      disable_http_challenge
+    }
+  }
+  reverse_proxy web:3000
+}

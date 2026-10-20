@@ -1,0 +1,34 @@
+# USER-OPERATED EXAMPLE ONLY. Not loaded by Terraform; do not rename/apply automatically.
+# These two extra resources are outside the ten-resource service setup.
+# Requires explicit activation approval and secure user entry. No values belong in files or chat.
+variable "fitness_supabase_secret" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+variable "fitness_openai_secret" {
+  type      = string
+  sensitive = true
+  ephemeral = true
+}
+resource "aws_ssm_parameter" "user_supabase" {
+  name             = "/secrets/production/fitness/SUPABASE_SERVICE_ROLE_KEY"
+  type             = "SecureString"
+  tier             = "Standard"
+  key_id           = "alias/aws/ssm"
+  value_wo         = var.fitness_supabase_secret
+  value_wo_version = 1
+  lifecycle { prevent_destroy = true }
+}
+resource "aws_ssm_parameter" "user_openai" {
+  name             = "/secrets/production/fitness/OPEN_AI_API_KEY"
+  type             = "SecureString"
+  tier             = "Standard"
+  key_id           = "alias/aws/ssm"
+  value_wo         = var.fitness_openai_secret
+  value_wo_version = 1
+  lifecycle { prevent_destroy = true }
+}
+# User supplies ephemeral inputs from their secure store through an approved mechanism.
+# Never use -var=secret-value, tfvars files, outputs, TF_LOG/debug logs, or model-visible entry.
+# No data-source lookup or extraction of the existing production keys is included.

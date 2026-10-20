@@ -16,3 +16,9 @@ test-results
 .vscode
 .idea
 *.log
+
+# Local-only infrastructure cache/state must never enter image layers.
+**/.terraform
+**/*.tfstate*
+**/*.tfvars
+**/*.tfplan

@@ -54,3 +54,6 @@ supabase/.temp
 playwright-report
 test-results
 coverage
+
+# Local Python validation caches
+__pycache__/
