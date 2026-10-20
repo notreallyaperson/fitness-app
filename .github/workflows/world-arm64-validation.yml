@@ -1,5 +1,7 @@
 name: Validate world ARM64 migration
 on:
+  push:
+    branches: [codex/world-migration]
   workflow_dispatch:
 permissions:
   contents: read
