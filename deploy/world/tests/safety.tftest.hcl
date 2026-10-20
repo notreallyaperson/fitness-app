@@ -23,26 +23,7 @@ variables {
   openai_parameter_arn       = "arn:aws:ssm:us-east-1:240851517002:parameter/secrets/production/fitness/OPEN_AI_API_KEY"
   secret_kms_key_arn         = "arn:aws:kms:us-east-1:240851517002:key/00000000-0000-0000-0000-000000000000"
 }
-run "inactive_candidate" {
+run "retired_root_rejects_plan" {
   command = plan
-  assert {
-    condition = jsondecode(aws_iam_role.publisher.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:notreallyaperson/fitness-app:environment:Live" && jsondecode(aws_iam_role.publisher.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:aud"] == "sts.amazonaws.com"
-    error_message = "Publisher IAM must retain exact repository/environment subject and STS audience; ref restriction is enforced by separately approved Live main-only rules."
-  }
-  assert {
-    condition     = aws_ecs_service.fitness.desired_count == 0 && aws_ecs_task_definition.fitness.network_mode == "bridge" && length(jsondecode(aws_ecs_task_definition.fitness.container_definitions)) == 1
-    error_message = "Preparation must not start tasks, enable premature ACME, or use host networking."
-  }
-  assert {
-    condition     = aws_ecs_task_definition.fitness.cpu == "256" && aws_ecs_task_definition.fitness.memory == "768"
-    error_message = "Fitness must retain a bounded task CPU/memory budget."
-  }
-}
-run "approved_tls_revision" {
-  command = plan
-  variables { enable_tls = true }
-  assert {
-    condition     = length(jsondecode(aws_ecs_task_definition.fitness.container_definitions)) == 2 && jsondecode(aws_ecs_task_definition.fitness.container_definitions)[1].links[0] == "web" && aws_ecs_service.fitness.desired_count == 0
-    error_message = "TLS must connect through the bridge link without implicitly starting service."
-  }
+  expect_failures = [var.fitness_legacy_root_retired]
 }
