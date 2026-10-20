@@ -28,6 +28,10 @@ variables {
 run "inactive_candidate" {
   command = plan
   assert {
+    condition = jsondecode(aws_iam_role.publisher.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] == "repo:notreallyaperson/fitness-app:environment:Live" && jsondecode(aws_iam_role.publisher.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:aud"] == "sts.amazonaws.com"
+    error_message = "Publisher IAM must retain exact repository/environment subject and STS audience; ref restriction is enforced by separately approved Live main-only rules."
+  }
+  assert {
     condition     = aws_ecs_service.fitness.desired_count == 0 && aws_ecs_task_definition.fitness.network_mode == "bridge" && length(jsondecode(aws_ecs_task_definition.fitness.container_definitions)) == 1
     error_message = "Preparation must not start tasks, enable premature ACME, or use host networking."
   }

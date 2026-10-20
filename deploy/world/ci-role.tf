@@ -1,3 +1,5 @@
+# PREREQUISITE: Live must allow only branch main (not tags/wildcards).
+# Environment OIDC sub omits ref; do not provision this role before that setting is verified.
 # New persistent access: review/approve before apply. Existing account OIDC provider only.
 data "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
